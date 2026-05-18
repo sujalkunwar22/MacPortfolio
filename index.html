@@ -1,0 +1,4367 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sujal Kunwar — Portfolio OS</title>
+  <style>
+    /* ============================================
+       CSS RESET & BASE
+    ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Light Mode Colors */
+      --bg-desktop: #C4D7E0;
+      --bg-desktop-2: #D4E5EE;
+      --bg-desktop-3: #E8D5C4;
+      --bg-desktop-4: #C9D8E0;
+      --surface-window: rgba(255, 255, 255, 0.78);
+      --surface-window-solid: #FFFFFF;
+      --surface-sidebar: #F5F5F7;
+      --surface-dock: rgba(255, 255, 255, 0.28);
+      --surface-menubar: rgba(255, 255, 255, 0.78);
+      --surface-modal: #FFFFFF;
+      --surface-terminal: #1E1E1E;
+      --text-primary: #1D1D1F;
+      --text-secondary: #86868B;
+      --text-tertiary: #A1A1A6;
+      --text-on-dark: #F5F5F7;
+      --accent-blue: #0071E3;
+      --accent-blue-hover: #0077ED;
+      --accent-green: #32D74B;
+      --accent-yellow: #FFBD2E;
+      --accent-red: #FF5F57;
+      --accent-orange: #FF9500;
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --border-glass: rgba(255, 255, 255, 0.35);
+      --shadow-window: 0 22px 70px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.12);
+      --shadow-window-inactive: 0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-dock: 0 4px 24px rgba(0,0,0,0.12);
+      --shadow-modal: 0 20px 60px rgba(0,0,0,0.25);
+      --tl-red: #FF5F57;
+      --tl-yellow: #FFBD2E;
+      --tl-green: #28C840;
+      --tl-icon: rgba(0,0,0,0.5);
+      --tl-icon-rest: rgba(0,0,0,0.35);
+      --window-radius: 12px;
+      --window-titlebar-height: 38px;
+      --menubar-height: 28px;
+      --dock-height: 64px;
+      --dock-icon-size: 48px;
+      --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SF Mono', 'SFMono-Regular', 'Fira Code', 'Menlo', 'Monaco', monospace;
+      --bg-wallpaper: url('light.jpg');
+    }
+
+    [data-theme="dark"] {
+      --bg-desktop: #1A1A2E;
+      --bg-desktop-2: #16213E;
+      --bg-desktop-3: #0F3460;
+      --bg-desktop-4: #1A1A3E;
+      --surface-window: rgba(44, 44, 46, 0.78);
+      --surface-window-solid: #2C2C2E;
+      --surface-sidebar: #1C1C1E;
+      --surface-dock: rgba(44, 44, 46, 0.55);
+      --surface-menubar: rgba(44, 44, 46, 0.78);
+      --surface-modal: #323234;
+      --text-primary: #F5F5F7;
+      --text-secondary: #98989D;
+      --text-tertiary: #6E6E73;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glass: rgba(255, 255, 255, 0.1);
+      --shadow-window: 0 22px 70px rgba(0,0,0,0.45), 0 8px 20px rgba(0,0,0,0.25);
+      --shadow-window-inactive: 0 12px 40px rgba(0,0,0,0.20), 0 4px 12px rgba(0,0,0,0.12);
+      --bg-wallpaper: url('dark.jpg');
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-system);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background: #000;
+    }
+
+    /* ============================================
+       BOOT SCREEN
+    ============================================ */
+    .boot-screen {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .boot-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .boot-logo {
+      width: 100px;
+      height: 100px;
+      opacity: 0;
+      transform: scale(0.98);
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+      transition: opacity 0.7s cubic-bezier(0.25, 1, 0.5, 1), transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .boot-logo.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .boot-logo.fade-away {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+
+    .boot-progress {
+      width: 130px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 2px;
+      margin-top: 45px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .boot-progress.visible {
+      opacity: 1;
+    }
+
+    .boot-progress.fade-away {
+      opacity: 0;
+    }
+
+    .boot-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #ffffff;
+      border-radius: 2px;
+      transition: width 0.08s linear;
+    }
+
+    /* ============================================
+       DESKTOP WALLPAPER
+    ============================================ */
+    .desktop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(135deg, var(--bg-desktop) 0%, var(--bg-desktop-2) 30%, var(--bg-desktop-3) 60%, var(--bg-desktop-4) 100%);
+      background-image: var(--bg-wallpaper);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0;
+      transition: opacity 0.8s ease, background-image 0.5s ease;
+    }
+
+    .desktop.booted {
+      opacity: 1;
+    }
+
+    @keyframes wallpaperShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .desktop::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    /* ============================================
+       MENU BAR
+    ============================================ */
+    .menu-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--menubar-height);
+      background: var(--surface-menubar);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      font-size: 13px;
+      color: var(--text-primary);
+      transform: translateY(-28px);
+      transition: transform 0.5s cubic-bezier(0.0, 0.0, 0.2, 1), background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .menu-bar.visible {
+      transform: translateY(0);
+    }
+
+    .menu-bar-left, .menu-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-apple {
+      width: 15px;
+      height: 15px;
+      cursor: default;
+      object-fit: contain;
+      filter: brightness(0) opacity(0.85);
+      transition: filter 0.3s ease;
+    }
+
+    [data-theme="dark"] .menu-apple {
+      filter: brightness(0) invert(1) opacity(0.9);
+    }
+
+    .menu-app-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .menu-item {
+      font-size: 12px;
+      font-weight: 400;
+      cursor: default;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: background 0.1s;
+      opacity: 0.9;
+      position: relative;
+      user-select: none;
+    }
+
+    .menu-item:hover,
+    .menu-item.active {
+      background: rgba(0,0,0,0.08);
+    }
+
+    [data-theme="dark"] .menu-item:hover,
+    [data-theme="dark"] .menu-item.active {
+      background: rgba(255,255,255,0.10);
+    }
+
+    /* Dropdown */
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      min-width: 220px;
+      background: rgba(235,235,235,0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 6px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.08);
+      padding: 4px 0;
+      z-index: 99999;
+      font-size: 13px;
+    }
+
+    [data-theme="dark"] .menu-dropdown {
+      background: rgba(40,40,40,0.96);
+      border-color: rgba(255,255,255,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4);
+    }
+
+    .menu-item.active .menu-dropdown {
+      display: block;
+    }
+
+    .menu-dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 16px;
+      cursor: default;
+      color: #1d1d1f;
+      white-space: nowrap;
+      border-radius: 4px;
+      margin: 0 4px;
+    }
+
+    [data-theme="dark"] .menu-dropdown-item {
+      color: #f0f0f0;
+    }
+
+    .menu-dropdown-item:hover {
+      background: #0063d3;
+      color: #fff;
+      border-radius: 4px;
+    }
+
+    .menu-dropdown-item.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .menu-dropdown-item .shortcut {
+      margin-left: 24px;
+      opacity: 0.55;
+      font-size: 12px;
+    }
+
+    .menu-dropdown-item:hover .shortcut {
+      opacity: 0.8;
+    }
+
+    .menu-dropdown-separator {
+      height: 1px;
+      background: rgba(0,0,0,0.12);
+      margin: 4px 0;
+    }
+
+    [data-theme="dark"] .menu-dropdown-separator {
+      background: rgba(255,255,255,0.12);
+    }
+
+    .menu-dropdown-header {
+      padding: 2px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      opacity: 0.45;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      pointer-events: none;
+    }
+
+
+    .menu-icon-btn {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+      transition: opacity 0.15s;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      padding: 0;
+    }
+
+    .menu-icon-btn:hover {
+      opacity: 1;
+    }
+
+    .menu-icon-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .menu-clock {
+      font-size: 12px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.1s;
+      user-select: none;
+    }
+
+    .menu-clock:hover {
+      background: rgba(0,0,0,0.06);
+    }
+
+    /* Clock Dropdown */
+    .clock-dropdown {
+      position: absolute;
+      top: calc(var(--menubar-height) + 6px);
+      right: 10px;
+      background: var(--surface-modal);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 10px;
+      box-shadow: var(--shadow-modal);
+      padding: 16px;
+      min-width: 220px;
+      opacity: 0;
+      transform: translateY(-4px) scale(0.97);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      pointer-events: none;
+      z-index: 5002;
+    }
+
+    .clock-dropdown.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .clock-date {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .clock-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+
+    .clock-calendar-day-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 4px;
+    }
+
+    .clock-calendar-day {
+      font-size: 11px;
+      padding: 4px;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      color: var(--text-primary);
+    }
+
+    .clock-calendar-day.today {
+      background: var(--accent-blue);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .clock-calendar-day.other-month {
+      color: var(--text-tertiary);
+    }
+
+    /* ============================================
+       DOCK
+    ============================================ */
+    .dock {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      z-index: 5001;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      padding: 10px 10px 4px;
+      background: var(--surface-dock);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-dock);
+      border-radius: 18px;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s, background 0.3s ease;
+    }
+
+    .dock.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dock-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .dock-item:hover {
+      transform: scale(1.3) translateY(-8px);
+    }
+
+    .dock-item:has(+ .dock-item:hover),
+    .dock-item:hover + .dock-item {
+      transform: scale(1.15) translateY(-4px);
+    }
+
+    .dock-item-icon {
+      width: var(--dock-icon-size);
+      height: var(--dock-icon-size);
+      border-radius: 10px;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .dock-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 4px rgba(255,255,255,0.4);
+      margin-top: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .dock-dot.active {
+      opacity: 1;
+    }
+
+    .dock-tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.1s;
+    }
+
+    .dock-item:hover .dock-tooltip {
+      opacity: 1;
+    }
+
+    .dock-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border-subtle);
+      margin: 0 4px;
+      align-self: center;
+    }
+
+    /* ============================================
+       WINDOW SYSTEM
+    ============================================ */
+    .windows-container {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .windows-container > * {
+      pointer-events: auto;
+    }
+
+    .mac-window {
+      position: absolute;
+      background: var(--surface-window);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: var(--window-radius);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-window-inactive);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 320px;
+      min-height: 200px;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: box-shadow 0.2s ease, opacity 0.3s ease, transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .mac-window.active {
+      box-shadow: var(--shadow-window);
+    }
+
+    .mac-window.opening {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .mac-window.minimizing {
+      transition: transform 0.4s cubic-bezier(0.4, 0.0, 1, 1), opacity 0.4s ease;
+    }
+
+    .mac-window.restoring {
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease;
+    }
+
+    .mac-window.maximized {
+      border-radius: 0;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    .mac-window-titlebar {
+      height: var(--window-titlebar-height);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: grab;
+      user-select: none;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .mac-window-titlebar:active {
+      cursor: grabbing;
+    }
+
+    .mac-window:not(.active) .mac-window-titlebar {
+      opacity: 0.6;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .traffic-light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      line-height: 1;
+      color: transparent;
+      transition: color 0.12s ease;
+      box-shadow: inset 0 0 0 0.5px rgba(0,0,0,0.15);
+      padding: 0;
+    }
+
+    .traffic-light.red { background: var(--tl-red); }
+    .traffic-light.yellow { background: var(--tl-yellow); }
+    .traffic-light.green { background: var(--tl-green); }
+
+    .traffic-light:hover {
+      color: var(--tl-icon);
+    }
+
+    .mac-window-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .mac-window-content {
+      flex: 1;
+      overflow: auto;
+      position: relative;
+      min-height: 0;
+    }
+
+    .mac-window-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .mac-window-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .mac-window-content::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15);
+      border-radius: 4px;
+    }
+
+    [data-theme="dark"] .mac-window-content::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .resize-handle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      z-index: 10;
+      background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.2) 50%);
+      border-radius: 0 0 12px 0;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .mac-window:hover .resize-handle {
+      opacity: 1;
+    }
+
+    /* ============================================
+       SPOTLIGHT OVERLAY
+    ============================================ */
+    .spotlight-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 18vh;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .spotlight-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .spotlight-search-box {
+      width: 560px;
+      max-width: 90vw;
+      background: var(--surface-modal);
+      border-radius: 10px;
+      box-shadow: var(--shadow-modal);
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      gap: 12px;
+      transform: scale(0.97);
+      transition: transform 0.15s ease;
+    }
+
+    .spotlight-overlay.active .spotlight-search-box {
+      transform: scale(1);
+    }
+
+    .spotlight-search-box svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      color: var(--text-secondary);
+    }
+
+    .spotlight-search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--text-primary);
+      font-family: var(--font-system);
+    }
+
+    .spotlight-search-box input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .spotlight-results {
+      width: 560px;
+      max-width: 90vw;
+      background: var(--surface-modal);
+      border-radius: 10px;
+      box-shadow: var(--shadow-modal);
+      margin-top: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .spotlight-results.has-results {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .spotlight-result {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      cursor: pointer;
+      transition: background 0.08s;
+      border-radius: 6px;
+      margin: 2px 6px;
+    }
+
+    .spotlight-result:hover,
+    .spotlight-result.selected {
+      background: rgba(0,0,0,0.04);
+    }
+
+    [data-theme="dark"] .spotlight-result:hover,
+    [data-theme="dark"] .spotlight-result.selected {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .spotlight-result-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .spotlight-result-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .spotlight-result-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .spotlight-result-app {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* ============================================
+       NOTIFICATION TOAST
+    ============================================ */
+    .notification-toast {
+      position: fixed;
+      top: 40px;
+      right: 20px;
+      z-index: 9500;
+      background: var(--surface-modal);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 12px;
+      box-shadow: var(--shadow-modal);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateX(calc(100% + 40px));
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 340px;
+    }
+
+    .notification-toast.show {
+      transform: translateX(0);
+    }
+
+    .notification-toast-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .notification-toast-icon svg {
+      width: 16px;
+      height: 16px;
+      color: #fff;
+    }
+
+    .notification-toast-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ============================================
+       FINDER WINDOW STYLES
+    ============================================ */
+    .finder-layout {
+      display: flex;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .finder-sidebar {
+      width: 180px;
+      min-width: 180px;
+      background: var(--surface-sidebar);
+      border-right: 1px solid var(--border-subtle);
+      padding: 10px 0;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .finder-sidebar-section {
+      margin-bottom: 14px;
+    }
+
+    .finder-sidebar-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding: 4px 14px;
+      letter-spacing: 0.03em;
+    }
+
+    .finder-sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background 0.1s;
+      border-radius: 0 4px 4px 0;
+      margin-right: 6px;
+    }
+
+    .finder-sidebar-item:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .finder-sidebar-item.active {
+      background: var(--accent-blue);
+      color: #fff;
+    }
+
+    .finder-main {
+      flex: 1;
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    .finder-profile-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .finder-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    }
+
+    .finder-profile-info h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .finder-profile-info p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .finder-section {
+      margin-bottom: 24px;
+    }
+
+    .finder-section h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .finder-section p {
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .finder-interests-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .finder-interest-card {
+      background: var(--surface-sidebar);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .finder-interest-card .icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .finder-interest-card h4 {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .finder-interest-card p {
+      font-size: 10px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Finder Photo Gallery Styles */
+    .finder-photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .finder-photo-card {
+      position: relative;
+      background: var(--surface-sidebar);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      aspect-ratio: 1 / 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .finder-photo-card:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+      border-color: var(--accent-blue);
+    }
+
+    .finder-photo-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .finder-photo-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .finder-photo-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0) 100%);
+      padding: 12px 8px 6px 8px;
+      color: #fff;
+      font-size: 10px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .finder-photo-card:hover .finder-photo-info {
+      opacity: 1;
+    }
+
+    /* macOS Quick Look Lightbox Overlay */
+    .quicklook-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px) saturate(140%);
+      -webkit-backdrop-filter: blur(10px) saturate(140%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-out;
+    }
+
+    .quicklook-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .quicklook-window {
+      width: 85vw;
+      max-width: 580px;
+      height: 80vh;
+      max-height: 500px;
+      background: rgba(30, 30, 30, 0.85);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.92);
+      transition: transform 0.25s cubic-bezier(0.2, 1, 0.2, 1);
+      color: #ffffff;
+      user-select: none;
+    }
+
+    .quicklook-overlay.active .quicklook-window {
+      transform: scale(1);
+    }
+
+    .quicklook-header {
+      height: 38px;
+      min-height: 38px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+    }
+
+    .quicklook-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .quicklook-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 8px;
+      color: transparent;
+      transition: color 0.15s ease;
+      padding: 0;
+    }
+
+    .quicklook-btn.close {
+      background: #ff5f56;
+    }
+    .quicklook-btn.close:hover {
+      background: #e0443e;
+      color: #4c0000;
+    }
+    .quicklook-btn.close::before {
+      content: '×';
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quicklook-title {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 0.2px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .quicklook-open-preview {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .quicklook-open-preview:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .quicklook-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0;
+      background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+      overflow: hidden;
+    }
+
+    .quicklook-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.15s ease;
+    }
+
+    /* macOS Floating Nav HUD */
+    .quicklook-hud {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(45, 45, 45, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .quicklook-hud-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.85);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .quicklook-hud-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .quicklook-hud-info {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .finder-tech-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tech-badge {
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: var(--surface-sidebar);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      font-weight: 500;
+    }
+
+    /* ============================================
+       TERMINAL WINDOW STYLES
+    ============================================ */
+    .terminal-body {
+      background: var(--surface-terminal);
+      color: var(--text-on-dark);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 12px 16px;
+      height: 100%;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .terminal-output-line {
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .terminal-prompt-line {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .terminal-prompt {
+      color: var(--accent-green);
+      flex-shrink: 0;
+    }
+
+    .terminal-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      flex: 1;
+      caret-color: var(--accent-green);
+    }
+
+    .terminal-cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: var(--accent-green);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .terminal-output-success {
+      color: var(--accent-green);
+    }
+
+    .terminal-output-error {
+      color: #FF453A;
+    }
+
+    .terminal-output-info {
+      color: var(--text-on-dark);
+    }
+
+    .terminal-skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .terminal-skill-category {
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      padding: 10px;
+    }
+
+    .terminal-skill-category h4 {
+      color: var(--accent-blue);
+      font-size: 12px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .terminal-skill-category ul {
+      list-style: none;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .terminal-skill-category li {
+      padding: 2px 0;
+    }
+
+    .terminal-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .terminal-canvas.active {
+      pointer-events: auto;
+    }
+
+    /* ============================================
+       SAFARI WINDOW STYLES
+    ============================================ */
+    .safari-chrome {
+      background: var(--surface-window-solid);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .safari-nav-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: background 0.1s;
+    }
+
+    .safari-nav-btn:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .safari-nav-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .safari-address-bar {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-sidebar);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+
+    .safari-address-bar svg {
+      width: 12px;
+      height: 12px;
+      color: var(--accent-green);
+      flex-shrink: 0;
+    }
+
+    .safari-address-bar .url {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .safari-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 6px 14px 0;
+      background: var(--surface-window-solid);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .safari-tab {
+      padding: 5px 14px;
+      font-size: 12px;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      font-family: var(--font-system);
+      transition: all 0.1s;
+    }
+
+    .safari-tab.active {
+      background: var(--surface-window);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .safari-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .safari-projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .project-card {
+      background: var(--surface-window-solid);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .project-card-image {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: var(--surface-sidebar);
+    }
+
+    .project-card-body {
+      padding: 14px;
+    }
+
+    .project-card-body h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .project-card-body p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .project-card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .project-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: var(--surface-sidebar);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .project-card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .project-btn {
+      flex: 1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-sidebar);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-system);
+      transition: all 0.15s;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .project-btn:hover {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+    }
+
+    /* ============================================
+       MAIL WINDOW STYLES
+    ============================================ */
+    .mail-body {
+      padding: 0;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .mail-form {
+      padding: 16px 20px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .mail-form.sent {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+
+    .mail-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .mail-field label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      min-width: 50px;
+      font-weight: 500;
+    }
+
+    .mail-field input,
+    .mail-field .readonly {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: var(--font-system);
+      padding: 2px 0;
+    }
+
+    .mail-field .readonly {
+      color: var(--text-secondary);
+    }
+
+    .mail-body-area {
+      width: 100%;
+      min-height: 200px;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: var(--font-system);
+      padding: 12px 0;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    .mail-body-area::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .mail-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px 20px;
+      border-top: 1px solid var(--border-subtle);
+      gap: 10px;
+    }
+
+    .mail-send-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-system);
+      transition: background 0.15s;
+    }
+
+    .mail-send-btn:hover {
+      background: var(--accent-blue-hover);
+    }
+
+    .mail-send-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .mail-success {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      gap: 16px;
+    }
+
+    .mail-success.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .mail-success-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mail-success-icon svg {
+      width: 30px;
+      height: 30px;
+      color: #fff;
+    }
+
+    .mail-success h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .mail-success p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Shake animation for validation error */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+    }
+
+    .shake {
+      animation: shake 0.4s ease;
+    }
+
+    /* ============================================
+       RESPONSIVE
+    ============================================ */
+    @media (max-width: 768px) {
+      .dock {
+        gap: 4px;
+        padding: 8px 8px 2px;
+      }
+
+      .dock-item:hover,
+      .dock-item:has(+ .dock-item:hover),
+      .dock-item:hover + .dock-item {
+        transform: none;
+      }
+
+      .mac-window {
+        border-radius: 0 !important;
+        top: var(--menubar-height) !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: calc(100vh - var(--menubar-height) - var(--dock-height) - 12px) !important;
+        transform: none !important;
+      }
+
+      .resize-handle {
+        display: none;
+      }
+
+      .spotlight-search-box,
+      .spotlight-results {
+        width: 90vw;
+      }
+
+      .finder-sidebar {
+        width: 140px;
+        min-width: 140px;
+      }
+
+      .finder-interests-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .finder-photo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .safari-projects-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .desktop {
+        animation: none;
+      }
+    }
+
+    /* Screen Brightness Overlay */
+    .brightness-overlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 999999;
+      transition: opacity 0.1s ease;
+    }
+
+    /* Do Not Disturb Menu Icon */
+    .dnd-menu-icon {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 4px;
+      color: #9b51e0;
+      animation: fadeIn 0.2s ease;
+    }
+
+    /* Right-aligned dropdown positions */
+    .menu-item .menu-dropdown.align-right {
+      right: 0;
+      left: auto;
+    }
+
+    /* Wi-Fi & Battery Custom Dropdowns */
+    .wifi-dropdown-content,
+    .battery-dropdown-content {
+      padding: 6px 12px;
+      width: 260px;
+    }
+
+    .dropdown-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .dropdown-title {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .ios-switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+
+    .ios-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .ios-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(120, 120, 128, 0.32);
+      transition: .2s;
+      border-radius: 20px;
+    }
+
+    .ios-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    input:checked + .ios-slider {
+      background-color: #34c759;
+    }
+
+    input:checked + .ios-slider:before {
+      transform: translateX(16px);
+    }
+
+    .network-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 6px;
+    }
+
+    .network-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: default;
+      font-size: 12px;
+      color: var(--text-primary);
+    }
+
+    .network-item:hover {
+      background: var(--border-subtle);
+    }
+
+    .network-item.active {
+      font-weight: 600;
+      color: #007aff;
+    }
+
+    [data-theme="dark"] .network-item.active {
+      color: #0a84ff;
+    }
+
+    .network-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .network-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.7;
+    }
+
+    /* Battery styles */
+    .battery-percentage-big {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .battery-health-info {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    /* Control Center Bento Grid */
+    .control-center-content {
+      padding: 10px;
+      width: 310px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-sizing: border-box;
+    }
+
+    .cc-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .cc-box {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    [data-theme="dark"] .cc-box {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .cc-box-half {
+      flex: 1;
+      height: 72px;
+    }
+
+    .cc-box-wide {
+      width: 100%;
+    }
+
+    .cc-icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(120, 120, 128, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .cc-icon-btn.active {
+      background: #007aff;
+      color: #fff;
+    }
+
+    .cc-icon-btn.active.green-active {
+      background: #34c759;
+    }
+
+    .cc-info {
+      margin-top: 4px;
+    }
+
+    .cc-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .cc-desc {
+      font-size: 10px;
+      color: var(--text-secondary);
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* CC Bento Left Block (Wifi/Bluetooth/AirDrop) */
+    .cc-bento-left {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 6px;
+    }
+
+    .cc-bento-left-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .cc-bento-left-item .cc-icon-btn {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+    }
+
+    .cc-bento-left-item-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Sliders styling */
+    .cc-slider-box {
+      width: 100%;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-sizing: border-box;
+    }
+
+    .cc-slider-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .cc-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .cc-slider-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--text-primary);
+      opacity: 0.8;
+      flex-shrink: 0;
+    }
+
+    .cc-slider-input-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .cc-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 20px;
+      border-radius: 10px;
+      background: rgba(120, 120, 128, 0.2);
+      outline: none;
+      margin: 0;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .cc-slider::-webkit-slider-runnable-track {
+      height: 20px;
+      border-radius: 10px;
+    }
+
+    .cc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: -200px 0 0 200px #007aff;
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    /* Mock Music Player Widget */
+    .cc-music-player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .cc-music-album {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #ff5e62, #ff9966);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      flex-shrink: 0;
+    }
+
+    .cc-music-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .cc-music-track {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cc-music-artist {
+      font-size: 10px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .cc-music-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cc-music-btn {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      opacity: 0.85;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.1s, opacity 0.1s;
+    }
+
+    .cc-music-btn:hover {
+      background: rgba(120, 120, 128, 0.15);
+      opacity: 1;
+    }
+
+    .cc-music-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .cc-music-btn.play-pause svg {
+      width: 16px;
+      height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Boot Screen -->
+  <div class="boot-screen" id="bootScreen">
+    <img class="boot-logo" id="bootLogo" src="apple logo.png" alt="Apple Logo">
+    <div class="boot-progress">
+      <div class="boot-progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Desktop Wallpaper -->
+  <div class="desktop" id="desktop"></div>
+
+  <!-- macOS Quick Look Modal Overlay -->
+  <div class="quicklook-overlay" id="quickLookOverlay" onclick="if(event.target === this) window.closeQuickLook()">
+    <div class="quicklook-window">
+      <div class="quicklook-header">
+        <div class="quicklook-controls">
+          <button class="quicklook-btn close" onclick="window.closeQuickLook()" title="Close"></button>
+        </div>
+        <div class="quicklook-title" id="quickLookTitle">photos/profile_1.jpg</div>
+        <div class="quicklook-open-preview" onclick="window.open(document.getElementById('quickLookImg').src, '_blank')">Open Image</div>
+      </div>
+      <div class="quicklook-body">
+        <img class="quicklook-img" id="quickLookImg" src="photos/profile_1.jpg" alt="Quick Look Preview">
+        <div class="quicklook-hud">
+          <button class="quicklook-hud-btn" onclick="window.showPrevPhoto()" title="Previous (Left Arrow)">◀</button>
+          <span class="quicklook-hud-info" id="quickLookInfo">1 of 11</span>
+          <button class="quicklook-hud-btn" onclick="window.showNextPhoto()" title="Next (Right Arrow)">▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu Bar -->
+  <div class="menu-bar" id="menuBar">
+    <div class="menu-bar-left">
+      <!-- Apple Logo -->
+      <img class="menu-apple" id="menuAppleLogo" src="apple logo.png" alt="Apple Logo">
+      <span class="menu-app-name" id="menuAppName">Finder</span>
+      <!-- File Menu -->
+      <span class="menu-item" id="menuFile">File
+        <div class="menu-dropdown" id="dropFile">
+          <div class="menu-dropdown-item" data-action="new-window">New Finder Window <span class="shortcut">⌘N</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="open-finder">Open Finder <span class="shortcut">⌘O</span></div>
+          <div class="menu-dropdown-item disabled">Get Info <span class="shortcut">⌘I</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="close-window">Close Window <span class="shortcut">⌘W</span></div>
+        </div>
+      </span>
+      <!-- Edit Menu -->
+      <span class="menu-item" id="menuEdit">Edit
+        <div class="menu-dropdown" id="dropEdit">
+          <div class="menu-dropdown-item disabled">Undo <span class="shortcut">⌘Z</span></div>
+          <div class="menu-dropdown-item disabled">Redo <span class="shortcut">⇧⌘Z</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item disabled">Cut <span class="shortcut">⌘X</span></div>
+          <div class="menu-dropdown-item disabled">Copy <span class="shortcut">⌘C</span></div>
+          <div class="menu-dropdown-item disabled">Paste <span class="shortcut">⌘V</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="select-all">Select All <span class="shortcut">⌘A</span></div>
+        </div>
+      </span>
+      <!-- View Menu -->
+      <span class="menu-item" id="menuView">View
+        <div class="menu-dropdown" id="dropView">
+          <div class="menu-dropdown-item" data-action="toggle-theme">Toggle Dark Mode <span class="shortcut">⌘D</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="tile-windows">Tile Windows</div>
+          <div class="menu-dropdown-item" data-action="close-all">Close All Windows <span class="shortcut">⌥⌘W</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="show-status-bar">Show Status Bar</div>
+        </div>
+      </span>
+      <!-- Go Menu -->
+      <span class="menu-item" id="menuGo">Go
+        <div class="menu-dropdown" id="dropGo">
+          <div class="menu-dropdown-item" data-action="open-finder">About Me (Finder) <span class="shortcut">⌘1</span></div>
+          <div class="menu-dropdown-item" data-action="open-safari">Projects (Safari) <span class="shortcut">⌘2</span></div>
+          <div class="menu-dropdown-item" data-action="open-terminal">Terminal <span class="shortcut">⌘3</span></div>
+          <div class="menu-dropdown-item" data-action="open-mail">Contact (Mail) <span class="shortcut">⌘4</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="goto-github">GitHub ↗</div>
+          <div class="menu-dropdown-item" data-action="goto-portfolio">sujalkunwar.com.np ↗</div>
+        </div>
+      </span>
+      <!-- Window Menu -->
+      <span class="menu-item" id="menuWindow">Window
+        <div class="menu-dropdown" id="dropWindow">
+          <div class="menu-dropdown-item" data-action="minimize-all">Minimize All <span class="shortcut">⌘M</span></div>
+          <div class="menu-dropdown-item" data-action="close-all">Close All <span class="shortcut">⌥⌘W</span></div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="open-finder">Finder — About Me</div>
+          <div class="menu-dropdown-item" data-action="open-safari">Safari — Projects</div>
+          <div class="menu-dropdown-item" data-action="open-terminal">Terminal</div>
+          <div class="menu-dropdown-item" data-action="open-mail">Mail — Contact</div>
+        </div>
+      </span>
+      <!-- Help Menu -->
+      <span class="menu-item" id="menuHelp">Help
+        <div class="menu-dropdown" id="dropHelp" style="right:0;left:auto;">
+          <div class="menu-dropdown-item" data-action="open-terminal">Open Terminal</div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item" data-action="goto-github">View Source on GitHub ↗</div>
+          <div class="menu-dropdown-item" data-action="goto-portfolio">Old Portfolio ↗</div>
+          <div class="menu-dropdown-separator"></div>
+          <div class="menu-dropdown-item disabled">Portfolio OS v1.0</div>
+        </div>
+      </span>
+    </div>
+
+    <div class="menu-bar-right">
+      <!-- Spotlight -->
+      <button class="menu-icon-btn" id="spotlightBtn" title="Spotlight Search (⌘K)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+
+      <!-- Wi-Fi Menu Item -->
+      <span class="menu-item" id="menuWifi">
+        <svg id="menuWifiIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg>
+        <div class="menu-dropdown align-right" id="dropWifi">
+          <div class="wifi-dropdown-content">
+            <div class="dropdown-header-row">
+              <span class="dropdown-title">Wi-Fi</span>
+              <label class="ios-switch">
+                <input type="checkbox" id="wifiToggleCheckbox" checked>
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+            <div class="menu-dropdown-separator"></div>
+            <div class="menu-dropdown-header" style="padding-left: 4px;">Known Networks</div>
+            <div class="network-list" id="wifiNetworkList">
+              <div class="network-item active" data-ssid="Sujal's iPhone">
+                <div class="network-info">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="network-check" style="color: #007aff;"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span id="connectedSSID">Sujal's iPhone</span>
+                </div>
+                <div class="network-icons">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg>
+                </div>
+              </div>
+              <div class="network-item" data-ssid="Home-5G">
+                <div class="network-info">
+                  <span style="width: 12px; display: inline-block;"></span>
+                  <span>Home-5G</span>
+                </div>
+                <div class="network-icons">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/></svg>
+                </div>
+              </div>
+              <div class="network-item" data-ssid="Cafe_Guest">
+                <div class="network-info">
+                  <span style="width: 12px; display: inline-block;"></span>
+                  <span>Cafe_Guest</span>
+                </div>
+                <div class="network-icons">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M5 12.859a10 10 0 0 1 14 0"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="menu-dropdown-separator"></div>
+            <div class="menu-dropdown-item" style="padding: 4px 8px; margin: 0;" data-action="show-status-bar">Network Settings...</div>
+          </div>
+        </div>
+      </span>
+
+      <!-- Battery Menu Item -->
+      <span class="menu-item" id="menuBattery">
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <svg id="menuBatteryIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/></svg>
+        </div>
+        <div class="menu-dropdown align-right" id="dropBattery">
+          <div class="battery-dropdown-content">
+            <div class="dropdown-header-row">
+              <span class="dropdown-title">Battery</span>
+              <span id="batteryPercentText" style="font-weight: 500; font-size: 13px;">88%</span>
+            </div>
+            <div class="battery-percentage-big" id="batteryPercentBig">88%</div>
+            <div class="battery-health-info" id="batteryStatusText">Power Source: Battery</div>
+            <div class="menu-dropdown-separator"></div>
+            <div class="menu-dropdown-header" style="padding-left: 4px;">Apps Using Significant Energy</div>
+            <div class="menu-dropdown-item disabled" style="margin: 0; padding: 4px 6px;">
+              <span>Safari</span>
+              <span class="shortcut" style="opacity: 0.6;">Using High Energy</span>
+            </div>
+            <div class="menu-dropdown-item disabled" style="margin: 0; padding: 4px 6px;">
+              <span>Terminal</span>
+              <span class="shortcut" style="opacity: 0.6;">0.8% CPU</span>
+            </div>
+            <div class="menu-dropdown-separator"></div>
+            <div class="menu-dropdown-item" style="padding: 4px 8px; margin: 0;" data-action="show-status-bar">Battery Settings...</div>
+          </div>
+        </div>
+      </span>
+
+      <!-- Control Center Menu Item -->
+      <span class="menu-item" id="menuControlCenter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: block;"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></svg>
+        <div class="menu-dropdown align-right" id="dropControlCenter" style="padding: 0; min-width: auto; border: none; background: transparent; box-shadow: none;">
+          <div class="control-center-content">
+            <!-- Bento Box row 1 -->
+            <div class="cc-row">
+              <!-- Left Bento Block -->
+              <div class="cc-box" style="flex: 1.2; padding: 8px 12px; gap: 8px;">
+                <div class="cc-bento-left-item" id="ccWifiItem">
+                  <div class="cc-icon-btn active green-active" id="ccWifiBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg>
+                  </div>
+                  <div class="cc-bento-left-item-text">
+                    <span class="cc-title">Wi-Fi</span>
+                    <span class="cc-desc" id="ccWifiDesc">Sujal's iPhone</span>
+                  </div>
+                </div>
+                <div class="cc-bento-left-item" id="ccBluetoothItem">
+                  <div class="cc-icon-btn active" id="ccBluetoothBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 7 10 10-5 5V2l5 5L7 17"/></svg>
+                  </div>
+                  <div class="cc-bento-left-item-text">
+                    <span class="cc-title">Bluetooth</span>
+                    <span class="cc-desc" id="ccBluetoothDesc">On</span>
+                  </div>
+                </div>
+                <div class="cc-bento-left-item" id="ccAirDropItem">
+                  <div class="cc-icon-btn active" id="ccAirDropBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m8 12 4-4 4 4"/><path d="m12 8v8"/></svg>
+                  </div>
+                  <div class="cc-bento-left-item-text">
+                    <span class="cc-title">AirDrop</span>
+                    <span class="cc-desc" id="ccAirDropDesc">Contacts Only</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Right Bento Blocks -->
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                <div class="cc-box cc-box-half" style="cursor: pointer;" id="ccDndBox">
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <div class="cc-icon-btn" id="ccDndBtn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                    </div>
+                    <div style="min-width: 0;">
+                      <div class="cc-title" style="font-size: 11px;">Do Not Disturb</div>
+                      <div class="cc-desc" id="ccDndDesc">Off</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="cc-box cc-box-half" style="cursor: pointer;" id="ccThemeBox">
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <div class="cc-icon-btn" id="ccThemeBtn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20V2z"/></svg>
+                    </div>
+                    <div style="min-width: 0;">
+                      <div class="cc-title" style="font-size: 11px;">Dark Mode</div>
+                      <div class="cc-desc" id="ccThemeDesc">Light</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Bento Box row 2 (Sliders) -->
+            <div class="cc-box cc-box-wide" style="padding: 6px 0;">
+              <!-- Brightness Slider -->
+              <div class="cc-slider-box">
+                <span class="cc-slider-title">Display</span>
+                <div class="cc-slider-row">
+                  <svg class="cc-slider-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                  <div class="cc-slider-input-container">
+                    <input type="range" min="0" max="80" value="0" class="cc-slider" id="ccBrightnessSlider">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cc-box cc-box-wide" style="padding: 6px 0;">
+              <!-- Volume Slider -->
+              <div class="cc-slider-box">
+                <span class="cc-slider-title">Sound</span>
+                <div class="cc-slider-row">
+                  <svg class="cc-slider-icon" id="ccVolumeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                  <div class="cc-slider-input-container">
+                    <input type="range" min="0" max="100" value="70" class="cc-slider" id="ccVolumeSlider">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bento Box row 3 (Music Widget) -->
+            <div class="cc-box cc-box-wide" style="padding: 6px 0;">
+              <div class="cc-music-player">
+                <div class="cc-music-album" id="ccMusicAlbum">♫</div>
+                <div class="cc-music-info">
+                  <span class="cc-music-track" id="ccMusicTrack">Sujal's Portfolio Theme</span>
+                  <span class="cc-music-artist" id="ccMusicArtist">Ambient Coding Vibe</span>
+                </div>
+                <div class="cc-music-controls">
+                  <button class="cc-music-btn" id="ccMusicPrev" title="Previous">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+                  </button>
+                  <button class="cc-music-btn play-pause" id="ccMusicPlayPause" title="Play">
+                    <svg viewBox="0 0 24 24" fill="currentColor" id="ccPlayIcon"><path d="M8 5v14l11-7z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor" id="ccPauseIcon" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                  </button>
+                  <button class="cc-music-btn" id="ccMusicNext" title="Next">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="m6 18 8.5-6L6 6zm9-12v12h2V6z"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </span>
+
+      <!-- Theme Toggle Icon -->
+      <button class="menu-icon-btn" id="themeToggle" title="Toggle Theme" style="display: none;">
+        <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+
+      <!-- Clock -->
+      <span class="menu-clock" id="menuClock">12:00 PM</span>
+    </div>
+    <!-- Clock Dropdown -->
+    <div class="clock-dropdown" id="clockDropdown">
+      <div class="clock-date" id="clockDate"></div>
+      <div class="clock-calendar" id="clockCalendar"></div>
+    </div>
+  </div>
+
+  <!-- Windows Container -->
+  <div class="windows-container" id="windowsContainer"></div>
+
+  <!-- Dock -->
+  <div class="dock" id="dock">
+    <div class="dock-item" data-app="finder" title="Finder">
+      <img class="dock-item-icon" src="finder.png" alt="Finder">
+      <div class="dock-dot" id="dot-finder"></div>
+      <div class="dock-tooltip">Finder</div>
+    </div>
+    <div class="dock-item" data-app="safari" title="Safari">
+      <img class="dock-item-icon" src="safari.png" alt="Safari">
+      <div class="dock-dot" id="dot-safari"></div>
+      <div class="dock-tooltip">Safari</div>
+    </div>
+    <div class="dock-item" data-app="terminal" title="Terminal">
+      <img class="dock-item-icon" src="terminal.png" alt="Terminal">
+      <div class="dock-dot" id="dot-terminal"></div>
+      <div class="dock-tooltip">Terminal</div>
+    </div>
+    <div class="dock-item" data-app="mail" title="Mail">
+      <img class="dock-item-icon" src="mail.png" alt="Mail">
+      <div class="dock-dot" id="dot-mail"></div>
+      <div class="dock-tooltip">Mail</div>
+    </div>
+    <div class="dock-divider"></div>
+    <div class="dock-item" data-app="settings" title="System Settings">
+      <img class="dock-item-icon" src="settings.png" alt="Settings">
+      <div class="dock-dot" id="dot-settings"></div>
+      <div class="dock-tooltip">System Settings</div>
+    </div>
+  </div>
+
+  <!-- Spotlight Overlay -->
+  <div class="spotlight-overlay" id="spotlightOverlay">
+    <div class="spotlight-search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Spotlight Search" id="spotlightInput" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="spotlight-results" id="spotlightResults"></div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="notification-toast" id="notificationToast">
+    <div class="notification-toast-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <span class="notification-toast-text" id="notificationText">Message Sent Successfully!</span>
+  </div>
+
+
+  <script>
+  // ============================================
+  //  macOS Portfolio OS - Sujal Kunwar
+  // ============================================
+
+  (function() {
+    'use strict';
+
+    // ============================================
+    // CONSTANTS & DATA
+    // ============================================
+    const APPS = {
+      finder: { name: 'Finder', title: 'About Me', icon: 'finder.png', width: 680, height: 500 },
+      safari: { name: 'Safari', title: 'Projects', icon: 'safari.png', width: 720, height: 540 },
+      terminal: { name: 'Terminal', title: 'Shell', icon: 'terminal.png', width: 600, height: 420 },
+      mail: { name: 'Mail', title: 'Contact', icon: 'mail.png', width: 520, height: 480 },
+    };
+
+    const SEARCH_INDEX = [
+      { app: 'finder', label: 'Profile', keywords: 'about me sujal kunwar profile nepal software engineer curriculum designer' },
+      { app: 'finder', label: 'Core Tech', keywords: 'javascript css html python web technologies tech stack skills' },
+      { app: 'finder', label: 'Education', keywords: 'education learning academic background' },
+      { app: 'finder', label: 'P', keywords: 'photography guitar ukulele cafe landscape changunarayan gorkha' },
+      { app: 'safari', label: 'Recipe Sharing Engine', keywords: 'recipe web project food cooking platform' },
+      { app: 'safari', label: 'Social Studies Framework', keywords: 'curriculum 132 day academic framework lesson plan education' },
+      { app: 'terminal', label: 'help command', keywords: 'help commands available' },
+      { app: 'terminal', label: 'skills command', keywords: 'skills technical expertise tools' },
+      { app: 'terminal', label: 'experience command', keywords: 'experience work history milestones' },
+      { app: 'terminal', label: 'contact command', keywords: 'contact email location social' },
+      { app: 'terminal', label: 'clear command', keywords: 'clear terminal screen' },
+      { app: 'terminal', label: 'hack easter egg', keywords: 'hack matrix rain easter egg fun' },
+      { app: 'terminal', label: 'coffee easter egg', keywords: 'coffee ascii art emoji fun' },
+      { app: 'mail', label: 'Send Message', keywords: 'contact email send message collaborate' },
+    ];
+
+    const TERMINAL_COMMANDS = {
+      help: `Available commands:
+  help        Show this help message
+  skills      Display technical skills breakdown
+  experience  Show work experience timeline
+  contact     Display contact information
+  clear       Clear the terminal screen
+  hack        Initiate Matrix rain sequence
+  coffee      Brew a virtual coffee`,
+
+      skills: `TECHNICAL SKILLS
+
+┌─ Programming ───────────────┐  ┌─ Web Technologies ──────────┐
+│ • Python                    │  │ • HTML5 / CSS3              │
+│ • Java                      │  │ • JavaScript                │
+│ • JavaScript                │  │ • Responsive Design         │
+│ • Git                       │  │ • RESTful APIs              │
+└─────────────────────────────┘  └─────────────────────────────┘`,
+
+      experience: `EXPERIENCE TIMELINE
+
+2024 – Present  │  Software Developer
+                │  • Building full-stack web applications
+                │  • Python & Java backend development
+                │  • Modern frontend with HTML/CSS/JS
+                │
+2022 – 2024     │  Junior Developer
+                │  • Frontend development
+                │  • Weather & service management apps
+                │  • Open source contributions`,
+
+      contact: `CONTACT INFORMATION
+
+  Email:    sujalkunwar22@gmail.com
+  Discord:  sujal#1234
+  Web:      sujalkunwar.com.np
+
+  Social:
+    • GitHub:    github.com/sujalkunwar22`,
+    };
+
+    // ============================================
+    // STATE
+    // ============================================
+    let windows = {};
+    let activeWindow = null;
+    let nextWindowId = 1;
+    let nextZ = 100;
+    let windowOffset = 0;
+    let theme = localStorage.getItem('theme') || 'light';
+    let isMobile = window.innerWidth <= 768;
+
+    // ============================================
+    // DOM REFERENCES
+    // ============================================
+    const $ = id => document.getElementById(id);
+    const bootScreen = $('bootScreen');
+    const bootLogo = $('bootLogo');
+    const desktop = $('desktop');
+    const menuBar = $('menuBar');
+    const menuAppName = $('menuAppName');
+    const menuClock = $('menuClock');
+    const clockDropdown = $('clockDropdown');
+    const clockDate = $('clockDate');
+    const clockCalendar = $('clockCalendar');
+    const dock = $('dock');
+    const windowsContainer = $('windowsContainer');
+    const spotlightOverlay = $('spotlightOverlay');
+    const spotlightInput = $('spotlightInput');
+    const spotlightResults = $('spotlightResults');
+    const notificationToast = $('notificationToast');
+    const notificationText = $('notificationText');
+    const themeToggle = $('themeToggle');
+    const themeIconSun = $('themeIconSun');
+    const themeIconMoon = $('themeIconMoon');
+
+    // ============================================
+    // BOOT SEQUENCE
+    // ============================================
+    function startBootSequence() {
+      const hasBooted = sessionStorage.getItem('hasBooted');
+      if (hasBooted) {
+        skipBoot();
+        return;
+      }
+
+      const progress = document.querySelector('.boot-progress');
+      const progressBar = document.querySelector('.boot-progress-bar');
+
+      // Phase 1: Logo fades in (from scale 0.98 to 1.0)
+      setTimeout(() => {
+        bootLogo.classList.add('visible');
+      }, 100);
+
+      // Phase 2: Progress bar fades in at 800ms
+      setTimeout(() => {
+        progress.classList.add('visible');
+      }, 800);
+
+      // Phase 3: Smooth progress loading (starts at 1100ms, takes 2200ms)
+      const loadStart = 1100;
+      const loadDuration = 2200;
+      const startTime = Date.now();
+
+      setTimeout(() => {
+        const progressInterval = setInterval(() => {
+          const elapsed = Date.now() - (startTime + loadStart);
+          if (elapsed >= loadDuration) {
+            progressBar.style.width = '100%';
+            clearInterval(progressInterval);
+
+            // Phase 4: Apple logo and progress bar fade out together in perfect sync
+            setTimeout(() => {
+              bootLogo.classList.add('fade-away');
+              progress.classList.add('fade-away');
+            }, 300);
+
+            // Phase 5: Boot screen fades out completely and desktop is booted
+            setTimeout(() => {
+              bootScreen.classList.add('fade-out');
+              desktop.classList.add('booted');
+            }, 900);
+
+            // Phase 6: Menu bar and Dock slide in gracefully
+            setTimeout(() => {
+              menuBar.classList.add('visible');
+            }, 1300);
+
+            setTimeout(() => {
+              dock.classList.add('visible');
+            }, 1500);
+
+            // Phase 7: Clean up boot screen and open Finder
+            setTimeout(() => {
+              bootScreen.style.display = 'none';
+              openWindow('finder');
+              sessionStorage.setItem('hasBooted', 'true');
+            }, 1900);
+
+          } else {
+            // Realistic macOS non-linear booting sequence simulation
+            const percentTime = elapsed / loadDuration;
+            let percentWidth;
+            if (percentTime < 0.25) {
+              percentWidth = percentTime * 1.6; // starts fast
+            } else if (percentTime < 0.7) {
+              percentWidth = 0.4 + (percentTime - 0.25) * 0.77; // steady slow loading
+            } else {
+              percentWidth = 0.75 + (percentTime - 0.7) * 0.83; // final sprint to 100%
+            }
+            percentWidth = Math.min(Math.max(percentWidth * 100, 0), 100);
+            progressBar.style.width = `${percentWidth}%`;
+          }
+        }, 16);
+      }, loadStart);
+    }
+
+    function skipBoot() {
+      bootScreen.style.display = 'none';
+      desktop.classList.add('booted');
+      menuBar.classList.add('visible');
+      dock.classList.add('visible');
+      setTimeout(() => openWindow('finder'), 200);
+    }
+
+    // ============================================
+    // THEME MANAGEMENT
+    // ============================================
+    function initTheme() {
+      document.documentElement.dataset.theme = theme;
+      updateThemeIcons();
+    }
+
+    function toggleTheme() {
+      theme = theme === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('theme', theme);
+      updateThemeIcons();
+    }
+
+    function updateThemeIcons() {
+      const ccThemeDesc = $('ccThemeDesc');
+      const ccThemeBtn = $('ccThemeBtn');
+      if (theme === 'dark') {
+        themeIconSun.style.display = 'none';
+        themeIconMoon.style.display = 'block';
+        if (ccThemeDesc) ccThemeDesc.textContent = 'Dark';
+        if (ccThemeBtn) ccThemeBtn.classList.add('active');
+      } else {
+        themeIconSun.style.display = 'block';
+        themeIconMoon.style.display = 'none';
+        if (ccThemeDesc) ccThemeDesc.textContent = 'Light';
+        if (ccThemeBtn) ccThemeBtn.classList.remove('active');
+      }
+    }
+
+    // ============================================
+    // CLOCK SYSTEM
+    // ============================================
+    function updateClock() {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const h12 = hours % 12 || 12;
+      menuClock.textContent = `${h12}:${minutes} ${ampm}`;
+    }
+
+    function updateCalendar() {
+      const now = new Date();
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      clockDate.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+
+      // Build calendar grid
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+      let html = '';
+      const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+      dayNames.forEach(d => {
+        html += `<div class="clock-calendar-day-name">${d}</div>`;
+      });
+
+      // Previous month days
+      for (let i = firstDay - 1; i >= 0; i--) {
+        html += `<div class="clock-calendar-day other-month">${daysInPrevMonth - i}</div>`;
+      }
+
+      // Current month days
+      const today = now.getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = d === today;
+        html += `<div class="clock-calendar-day ${isToday ? 'today' : ''}">${d}</div>`;
+      }
+
+      // Next month days
+      const remainingCells = (7 - ((firstDay + daysInMonth) % 7)) % 7;
+      for (let d = 1; d <= remainingCells; d++) {
+        html += `<div class="clock-calendar-day other-month">${d}</div>`;
+      }
+
+      clockCalendar.innerHTML = html;
+    }
+
+    function toggleClockDropdown() {
+      const isOpen = clockDropdown.classList.contains('show');
+      if (isOpen) {
+        clockDropdown.classList.remove('show');
+      } else {
+        updateCalendar();
+        clockDropdown.classList.add('show');
+      }
+    }
+
+    // ============================================
+    // WINDOW MANAGER
+    // ============================================
+    function updateDockDots() {
+      const apps = ['finder', 'safari', 'terminal', 'mail'];
+      apps.forEach(appName => {
+        const openWindows = Object.values(windows).filter(w => w.appName === appName && !w.isClosed);
+        const dot = document.getElementById('dot-' + appName);
+        if (dot) {
+          if (openWindows.length > 0) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        }
+      });
+    }
+
+    function updateWindowMenu() {
+      const dropWindow = document.getElementById('dropWindow');
+      if (!dropWindow) return;
+
+      let html = `
+        <div class="menu-dropdown-item" data-action="minimize-all">Minimize All <span class="shortcut">⌘M</span></div>
+        <div class="menu-dropdown-item" data-action="close-all">Close All <span class="shortcut">⌥⌘W</span></div>
+        <div class="menu-dropdown-separator"></div>
+      `;
+
+      const activeWindows = Object.values(windows).filter(w => !w.isClosed);
+
+      if (activeWindows.length === 0) {
+        html += `<div class="menu-dropdown-item disabled">No Open Windows</div>`;
+      } else {
+        activeWindows.forEach(w => {
+          const app = APPS[w.appName];
+          const isCurrentActive = (activeWindow === w.id);
+          const checkmark = isCurrentActive ? '✓ ' : '&nbsp;&nbsp;&nbsp;';
+          const minimizedSuffix = w.isMinimized ? ' (Minimized)' : '';
+          html += `
+            <div class="menu-dropdown-item ${isCurrentActive ? 'active' : ''}" data-window-id="${w.id}" data-action="focus-window-item">
+              ${checkmark}${app.title}${minimizedSuffix}
+            </div>
+          `;
+        });
+      }
+
+      dropWindow.innerHTML = html;
+
+      // Re-bind listeners inside dropWindow
+      dropWindow.querySelectorAll('.menu-dropdown-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const action = item.dataset.action;
+          if (action === 'focus-window-item') {
+            const winId = item.dataset.windowId;
+            if (windows[winId]) {
+              if (windows[winId].isMinimized) {
+                restoreWindow(winId);
+              }
+              focusWindow(winId);
+            }
+            // Close dropdowns
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+          } else {
+            handleMenuAction(action);
+          }
+        });
+      });
+    }
+
+    function handleAppLaunch(appName) {
+      const openWindows = Object.values(windows)
+        .filter(w => w.appName === appName && !w.isClosed)
+        .sort((a, b) => b.zIndex - a.zIndex);
+
+      if (openWindows.length === 0) {
+        openWindow(appName);
+      } else {
+        if (activeWindow && windows[activeWindow] && windows[activeWindow].appName === appName) {
+          openWindow(appName);
+        } else {
+          const targetWin = openWindows[0];
+          if (targetWin.isMinimized) {
+            restoreWindow(targetWin.id);
+          }
+          focusWindow(targetWin.id);
+        }
+      }
+    }
+
+    function openWindow(appName) {
+      if (appName === 'settings') {
+        toggleTheme();
+        return;
+      }
+
+      const app = APPS[appName];
+      if (!app) return;
+
+      const windowId = `${appName}-${nextWindowId++}`;
+      const winEl = createWindowElement(windowId, app, appName);
+      windowsContainer.appendChild(winEl);
+
+      windows[windowId] = {
+        id: windowId,
+        appName: appName,
+        element: winEl,
+        isClosed: false,
+        isMinimized: false,
+        isMaximized: false,
+        preMinimizeRect: null,
+        preMaximizeRect: null,
+        zIndex: nextZ,
+      };
+
+      // Position with cascade
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const x = Math.min(40 + windowOffset, vw - app.width - 40);
+      const y = Math.min(40 + windowOffset + 28, vh - app.height - 100);
+      windowOffset = (windowOffset + 30) % 120;
+
+      winEl.style.left = x + 'px';
+      winEl.style.top = y + 'px';
+      winEl.style.width = app.width + 'px';
+      winEl.style.height = app.height + 'px';
+      winEl.style.zIndex = nextZ++;
+
+      // Trigger open animation
+      requestAnimationFrame(() => {
+        winEl.classList.add('opening');
+      });
+
+      // App-specific setup
+      if (appName === 'finder') setupFinder(winEl);
+      if (appName === 'terminal') setupTerminal(winEl);
+      if (appName === 'safari') setupSafari(winEl);
+      if (appName === 'mail') setupMail(winEl);
+
+      focusWindow(windowId);
+      updateDockDots();
+      updateWindowMenu();
+
+      // Bounce dock icon
+      const dockItem = document.querySelector(`.dock-item[data-app="${appName}"]`);
+      if (dockItem) {
+        dockItem.style.animation = 'none';
+        requestAnimationFrame(() => {
+          dockItem.style.animation = '';
+          dockItem.style.transform = 'translateY(-12px)';
+          setTimeout(() => { dockItem.style.transform = ''; }, 200);
+        });
+      }
+    }
+
+    function createWindowElement(windowId, app, appName) {
+      const div = document.createElement('div');
+      div.className = 'mac-window';
+      div.dataset.windowId = windowId;
+      div.dataset.app = appName;
+
+      div.innerHTML = `
+        <div class="mac-window-titlebar">
+          <div class="traffic-lights">
+            <button class="traffic-light red" data-action="close" title="Close">\u00D7</button>
+            <button class="traffic-light yellow" data-action="minimize" title="Minimize">\u2212</button>
+            <button class="traffic-light green" data-action="maximize" title="Maximize">+</button>
+          </div>
+          <span class="mac-window-title">${app.title}</span>
+        </div>
+        <div class="mac-window-content"></div>
+        <div class="resize-handle"></div>
+      `;
+
+      // Event listeners
+      const titlebar = div.querySelector('.mac-window-titlebar');
+      titlebar.addEventListener('mousedown', e => startDrag(e, windowId));
+      titlebar.addEventListener('touchstart', e => startDrag(e, windowId), { passive: false });
+
+      div.addEventListener('mousedown', () => focusWindow(windowId));
+      div.addEventListener('touchstart', () => focusWindow(windowId));
+
+      div.querySelectorAll('.traffic-light').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const action = btn.dataset.action;
+          if (action === 'close') closeWindow(windowId);
+          if (action === 'minimize') minimizeWindow(windowId);
+          if (action === 'maximize') maximizeWindow(windowId);
+        });
+      });
+
+      // Resize
+      const resizeHandle = div.querySelector('.resize-handle');
+      resizeHandle.addEventListener('mousedown', e => startResize(e, windowId));
+
+      return div;
+    }
+
+    function closeWindow(windowId) {
+      const win = windows[windowId];
+      if (!win || win.isClosed) return;
+
+      win.element.style.opacity = '0';
+      win.element.style.transform = 'scale(0.9)';
+      win.element.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+
+      setTimeout(() => {
+        if (win.element.parentNode) win.element.parentNode.removeChild(win.element);
+        win.isClosed = true;
+        win.isMinimized = false;
+
+        updateDockDots();
+
+        if (activeWindow === windowId) {
+          activeWindow = null;
+          // Focus next window in zIndex order
+          const remaining = Object.values(windows)
+            .filter(w => !w.isClosed && !w.isMinimized)
+            .sort((a, b) => b.zIndex - a.zIndex);
+          if (remaining.length > 0) {
+            focusWindow(remaining[0].id);
+          } else {
+            menuAppName.textContent = 'Finder';
+          }
+        }
+        updateWindowMenu();
+      }, 200);
+    }
+
+    function minimizeWindow(windowId) {
+      const win = windows[windowId];
+      if (!win || win.isClosed || win.isMinimized) return;
+
+      const rect = win.element.getBoundingClientRect();
+      win.preMinimizeRect = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+
+      const dockItem = document.querySelector(`.dock-item[data-app="${win.appName}"]`);
+      const dockRect = dockItem ? dockItem.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight - 30 };
+
+      const scale = 0.05;
+      const targetX = dockRect.left + dockRect.width / 2 - (rect.left + rect.width / 2);
+      const targetY = dockRect.top + dockRect.height / 2 - (rect.top + rect.height / 2);
+
+      win.element.classList.add('minimizing');
+      win.element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) scale3d(${scale}, ${scale}, 1)`;
+      win.element.style.opacity = '0';
+
+      setTimeout(() => {
+        win.isMinimized = true;
+        win.element.style.visibility = 'hidden';
+        win.element.classList.remove('minimizing');
+
+        updateDockDots();
+        
+        if (activeWindow === windowId) {
+          activeWindow = null;
+          // Focus next window in zIndex order
+          const remaining = Object.values(windows)
+            .filter(w => !w.isClosed && !w.isMinimized)
+            .sort((a, b) => b.zIndex - a.zIndex);
+          if (remaining.length > 0) {
+            focusWindow(remaining[0].id);
+          } else {
+            menuAppName.textContent = 'Finder';
+          }
+        }
+        updateWindowMenu();
+      }, 400);
+    }
+
+    function restoreWindow(windowId) {
+      const win = windows[windowId];
+      if (!win || !win.isMinimized) return;
+
+      const rect = win.preMinimizeRect;
+      win.element.style.visibility = 'visible';
+      win.element.style.left = rect.left + 'px';
+      win.element.style.top = rect.top + 'px';
+      win.element.style.width = rect.width + 'px';
+      win.element.style.height = rect.height + 'px';
+
+      win.element.classList.add('restoring');
+      win.element.style.transform = '';
+      win.element.style.opacity = '1';
+
+      setTimeout(() => {
+        win.isMinimized = false;
+        win.element.classList.remove('restoring');
+        focusWindow(windowId);
+        updateDockDots();
+        updateWindowMenu();
+      }, 350);
+    }
+
+    function maximizeWindow(windowId) {
+      const win = windows[windowId];
+      if (!win || win.isClosed) return;
+
+      if (win.isMaximized) {
+        // Restore
+        const rect = win.preMaximizeRect;
+        win.element.classList.remove('maximized');
+        win.element.style.left = rect.left + 'px';
+        win.element.style.top = rect.top + 'px';
+        win.element.style.width = rect.width + 'px';
+        win.element.style.height = rect.height + 'px';
+        win.element.style.borderRadius = '';
+        win.isMaximized = false;
+      } else {
+        // Maximize
+        const rect = win.element.getBoundingClientRect();
+        win.preMaximizeRect = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+        win.element.classList.add('maximized');
+        win.element.style.left = '0px';
+        win.element.style.top = '28px';
+        win.element.style.width = '100vw';
+        win.element.style.height = 'calc(100vh - 28px)';
+        win.isMaximized = true;
+      }
+    }
+
+    function focusWindow(windowId) {
+      const win = windows[windowId];
+      if (!win || win.isClosed) return;
+
+      // Deactivate all
+      document.querySelectorAll('.mac-window').forEach(w => {
+        w.classList.remove('active');
+        w.style.boxShadow = '';
+      });
+
+      // Activate target
+      win.element.classList.add('active');
+      win.zIndex = nextZ++;
+      win.element.style.zIndex = win.zIndex;
+      activeWindow = windowId;
+      menuAppName.textContent = APPS[win.appName].name;
+      updateWindowMenu();
+
+      // Dynamic first option in File menu
+      const fileNewItem = document.querySelector('#dropFile [data-action="new-window"]');
+      if (fileNewItem) {
+        if (win.appName === 'mail') {
+          fileNewItem.innerHTML = `New Message <span class="shortcut">⌘N</span>`;
+        } else {
+          fileNewItem.innerHTML = `New ${APPS[win.appName].name} Window <span class="shortcut">⌘N</span>`;
+        }
+      }
+    }
+
+    // ============================================
+    // DRAG SYSTEM
+    // ============================================
+    let dragState = null;
+
+    function startDrag(e, windowId) {
+      if (isMobile) return;
+      e.preventDefault();
+      const win = windows[windowId];
+      if (!win || win.isMaximized) return;
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const rect = win.element.getBoundingClientRect();
+
+      dragState = {
+        windowId,
+        offsetX: clientX - rect.left,
+        offsetY: clientY - rect.top,
+        width: rect.width,
+        height: rect.height,
+      };
+
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('mouseup', onDragEnd);
+      document.addEventListener('touchmove', onDragMove, { passive: false });
+      document.addEventListener('touchend', onDragEnd);
+    }
+
+    function onDragMove(e) {
+      if (!dragState) return;
+      e.preventDefault();
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const mb = 28;
+
+      let x = clientX - dragState.offsetX;
+      let y = clientY - dragState.offsetY;
+
+      // Bounds
+      y = Math.max(mb, y);
+      x = Math.max(-dragState.width + 40, x);
+      x = Math.min(vw - 40, x);
+      y = Math.min(vh - 40, y);
+
+      const win = windows[dragState.windowId];
+      win.element.style.left = x + 'px';
+      win.element.style.top = y + 'px';
+    }
+
+    function onDragEnd() {
+      dragState = null;
+      document.removeEventListener('mousemove', onDragMove);
+      document.removeEventListener('mouseup', onDragEnd);
+      document.removeEventListener('touchmove', onDragMove);
+      document.removeEventListener('touchend', onDragEnd);
+    }
+
+    // ============================================
+    // RESIZE SYSTEM
+    // ============================================
+    let resizeState = null;
+
+    function startResize(e, windowId) {
+      if (isMobile) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const win = windows[windowId];
+      if (!win || win.isMaximized) return;
+
+      resizeState = {
+        windowId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startW: win.element.offsetWidth,
+        startH: win.element.offsetHeight,
+      };
+
+      document.addEventListener('mousemove', onResizeMove);
+      document.addEventListener('mouseup', onResizeEnd);
+    }
+
+    function onResizeMove(e) {
+      if (!resizeState) return;
+      const win = windows[resizeState.windowId];
+      const newW = Math.max(320, resizeState.startW + e.clientX - resizeState.startX);
+      const newH = Math.max(200, resizeState.startH + e.clientY - resizeState.startY);
+      win.element.style.width = newW + 'px';
+      win.element.style.height = newH + 'px';
+    }
+
+    function onResizeEnd() {
+      resizeState = null;
+      document.removeEventListener('mousemove', onResizeMove);
+      document.removeEventListener('mouseup', onResizeEnd);
+    }
+
+    // ============================================
+    // SPOTLIGHT SEARCH
+    // ============================================
+    function openSpotlight() {
+      spotlightOverlay.classList.add('active');
+      spotlightInput.value = '';
+      spotlightInput.focus();
+      spotlightResults.innerHTML = '';
+      spotlightResults.classList.remove('has-results');
+    }
+
+    function closeSpotlight() {
+      spotlightOverlay.classList.remove('active');
+      spotlightResults.classList.remove('has-results');
+    }
+
+    function handleSpotlightSearch(query) {
+      if (!query.trim()) {
+        spotlightResults.innerHTML = '';
+        spotlightResults.classList.remove('has-results');
+        return;
+      }
+
+      const q = query.toLowerCase();
+      const results = SEARCH_INDEX.filter(item =>
+        item.keywords.toLowerCase().includes(q) || item.label.toLowerCase().includes(q)
+      );
+
+      if (results.length === 0) {
+        spotlightResults.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-secondary);font-size:13px;">No results found</div>';
+        spotlightResults.classList.add('has-results');
+        return;
+      }
+
+      let html = '';
+      results.forEach((result, i) => {
+        const app = APPS[result.app];
+        html += `
+          <div class="spotlight-result" data-app="${result.app}" data-index="${i}">
+            <img class="spotlight-result-icon" src="${app ? app.icon : ''}" alt="">
+            <div class="spotlight-result-text">
+              <div class="spotlight-result-name">${result.label}</div>
+              <div class="spotlight-result-app">${app ? app.name : ''}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      spotlightResults.innerHTML = html;
+      spotlightResults.classList.add('has-results');
+
+      spotlightResults.querySelectorAll('.spotlight-result').forEach(el => {
+        el.addEventListener('click', () => {
+          const appName = el.dataset.app;
+          closeSpotlight();
+          openWindow(appName);
+        });
+      });
+    }
+
+    // ============================================
+    // NOTIFICATION
+    // ============================================
+    function showNotification(text) {
+      notificationText.textContent = text;
+      notificationToast.classList.add('show');
+      setTimeout(() => {
+        notificationToast.classList.remove('show');
+      }, 3000);
+    }
+
+    // ============================================
+    // FINDER APP
+    // ============================================
+    function setupFinder(el) {
+      // Pre-load dynamic photos on startup in the background
+      loadDynamicPhotos();
+
+      const content = el.querySelector('.mac-window-content');
+      content.innerHTML = `
+        <div class="finder-layout">
+          <div class="finder-sidebar">
+            <div class="finder-sidebar-section">
+              <div class="finder-sidebar-title">Favorites</div>
+              <div class="finder-sidebar-item active" data-section="profile">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Profile
+              </div>
+              <div class="finder-sidebar-item" data-section="tech">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Core Tech
+              </div>
+              <div class="finder-sidebar-item" data-section="education">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.24 3 5 3s5-1.34 5-3v-5"/></svg>
+                Education
+              </div>
+            </div>
+            <div class="finder-sidebar-section">
+              <div class="finder-sidebar-title">Recents</div>
+              <div class="finder-sidebar-item" data-section="interests">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                Photos
+              </div>
+            </div>
+            <div class="finder-sidebar-section">
+              <div class="finder-sidebar-title">Locations</div>
+              <div class="finder-sidebar-item" data-section="location-gorkha">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Haramtari, Gorkha
+              </div>
+              <div class="finder-sidebar-item" data-section="location-madhyapur">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Madhyapur Thimi
+              </div>
+            </div>
+          </div>
+          <div class="finder-main" id="finder-main">
+            ${getFinderProfileHTML()}
+          </div>
+        </div>
+      `;
+
+      // Sidebar navigation
+      content.querySelectorAll('.finder-sidebar-item').forEach(item => {
+        item.addEventListener('click', () => {
+          content.querySelectorAll('.finder-sidebar-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const section = item.dataset.section;
+          const main = content.querySelector('#finder-main');
+          if (section === 'profile') main.innerHTML = getFinderProfileHTML();
+          if (section === 'tech') main.innerHTML = getFinderTechHTML();
+          if (section === 'education') main.innerHTML = getFinderEducationHTML();
+          if (section === 'interests') {
+            loadDynamicPhotos().then(() => {
+              main.innerHTML = getFinderInterestsHTML();
+            });
+          }
+          if (section === 'location-gorkha') main.innerHTML = getFinderGorkhaHTML();
+          if (section === 'location-madhyapur') main.innerHTML = getFinderMadhyapurHTML();
+        });
+      });
+    }
+
+    function getFinderProfileHTML() {
+      return `
+        <div class="finder-profile-header">
+          <img class="finder-avatar" src="photos/profile_4.jpg" alt="Sujal Kunwar">
+          <div class="finder-profile-info">
+            <h2>Sujal Kunwar</h2>
+            <p>Software Developer</p>
+            <p style="margin-top:2px;">Nepal</p>
+          </div>
+        </div>
+        <div class="finder-section">
+          <h3>About</h3>
+          <p>I'm a software developer with a strong foundation in Python, Java, and modern web tech. I believe in writing clean code that solves real-world problems.</p>
+        </div>
+        <div class="finder-section">
+          <h3>What I Do</h3>
+          <p>I craft beautiful and functional websites that help businesses grow and succeed in the digital world. From service management systems to weather apps and expense trackers — I build things that matter.</p>
+        </div>
+      `;
+    }
+
+    function getFinderTechHTML() {
+      return `
+        <div class="finder-section">
+          <h3>Tech Stack</h3>
+          <div class="finder-tech-badges">
+            <span class="tech-badge">HTML5</span>
+            <span class="tech-badge">CSS3</span>
+            <span class="tech-badge">JavaScript</span>
+            <span class="tech-badge">Python</span>
+            <span class="tech-badge">Java</span>
+            <span class="tech-badge">Git</span>
+          </div>
+        </div>
+        <div class="finder-section">
+          <h3>Core Focus</h3>
+          <p>Building clean, functional software with Python and Java on the backend, and crafting modern, responsive interfaces with HTML, CSS, and JavaScript on the frontend.</p>
+        </div>
+      `;
+    }
+
+    function getFinderEducationHTML() {
+      return `
+        <div class="finder-section">
+          <h3>Education</h3>
+          <p><strong>Computer Science & Software Development</strong></p>
+          <p>Strong foundation in software engineering principles, object-oriented programming with Java, and Python scripting — focused on building real-world solutions.</p>
+          <br>
+          <p><strong>Web Technologies</strong></p>
+          <p>Self-taught expertise in modern frontend development with HTML5, CSS3, and JavaScript, building responsive and functional web applications.</p>
+        </div>
+        <div class="finder-section">
+          <h3>Skills & Tools</h3>
+          <p>• Python — scripting, data handling, JSON-based apps</p>
+          <p>• Java — object-oriented systems, service management</p>
+          <p>• HTML5, CSS3, JavaScript — modern web development</p>
+          <p>• Git — version control & open source collaboration</p>
+        </div>
+      `;
+    }
+
+    // Global gallery variables/functions for Quick Look
+     const profilePhotos = [
+      'photos/profile_1.jpg',
+      'photos/profile_2.jpg',
+      'photos/profile_3.jpg',
+      'photos/profile_4.jpg',
+      'photos/profile_5.jpg',
+      'photos/profile_6.jpg',
+      'photos/profile_7.jpg',
+      'photos/profile_8.jpg',
+      'photos/profile_9.jpg',
+      'photos/profile_10.jpg',
+      'photos/profile_11.jpg'
+     ];
+    let currentPhotoIndex = 0;
+
+    async function loadDynamicPhotos() {
+      try {
+        const response = await fetch('photos/');
+        if (!response.ok) return;
+        const text = await response.text();
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const links = doc.querySelectorAll('a');
+        
+        const foundPhotos = [];
+        links.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href) {
+            const filename = decodeURIComponent(href).split('/').pop();
+            if (filename.toLowerCase().startsWith('profile') && 
+                (filename.toLowerCase().endsWith('.jpg') || 
+                 filename.toLowerCase().endsWith('.jpeg') || 
+                 filename.toLowerCase().endsWith('.png') || 
+                 filename.toLowerCase().endsWith('.webp'))) {
+              
+              const fullPath = `photos/${filename}`;
+              if (!foundPhotos.includes(fullPath)) {
+                foundPhotos.push(fullPath);
+              }
+            }
+          }
+        });
+
+        if (foundPhotos.length > 0) {
+          // Sort numerically/alphabetically
+          foundPhotos.sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, ''), 10);
+            const numB = parseInt(b.replace(/\D/g, ''), 10);
+            if (!isNaN(numA) && !isNaN(numB)) {
+              return numA - numB;
+            }
+            return a.localeCompare(b);
+          });
+          
+          profilePhotos.length = 0;
+          profilePhotos.push(...foundPhotos);
+          console.log('Loaded photos from folder:', profilePhotos);
+        }
+      } catch (error) {
+        console.warn('Unable to dynamically read photos directory (likely file:// protocol):', error);
+      }
+    }
+
+    window.openQuickLook = function(index) {
+      currentPhotoIndex = index;
+      const overlay = document.getElementById('quickLookOverlay');
+      const img = document.getElementById('quickLookImg');
+      const title = document.getElementById('quickLookTitle');
+      const info = document.getElementById('quickLookInfo');
+      
+      if (!overlay || !img || !title || !info) return;
+
+      img.style.opacity = '0';
+      img.src = profilePhotos[index];
+      title.textContent = '';
+      info.textContent = `${index + 1} of ${profilePhotos.length}`;
+      
+      overlay.classList.add('active');
+      setTimeout(() => { img.style.opacity = '1'; }, 50);
+    };
+
+    window.closeQuickLook = function() {
+      const overlay = document.getElementById('quickLookOverlay');
+      if (overlay) overlay.classList.remove('active');
+    };
+
+    window.showNextPhoto = function() {
+      currentPhotoIndex = (currentPhotoIndex + 1) % profilePhotos.length;
+      updateQuickLookContent();
+    };
+
+    window.showPrevPhoto = function() {
+      currentPhotoIndex = (currentPhotoIndex - 1 + profilePhotos.length) % profilePhotos.length;
+      updateQuickLookContent();
+    };
+
+    function updateQuickLookContent() {
+      const img = document.getElementById('quickLookImg');
+      const title = document.getElementById('quickLookTitle');
+      const info = document.getElementById('quickLookInfo');
+      if (!img || !title || !info) return;
+
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = profilePhotos[currentPhotoIndex];
+        title.textContent = '';
+        info.textContent = `${currentPhotoIndex + 1} of ${profilePhotos.length}`;
+        img.style.opacity = '1';
+      }, 100);
+    }
+
+    function getFinderInterestsHTML() {
+      let gridHTML = '';
+      profilePhotos.forEach((photo, index) => {
+        gridHTML += `
+          <div class="finder-photo-card" onclick="window.openQuickLook(${index})">
+            <img src="${photo}" alt="" loading="lazy">
+          </div>
+        `;
+      });
+
+      return `
+        <div class="finder-section" style="display:flex; flex-direction:column; height: 100%;">
+          <h3 style="margin-bottom: 4px;">Photo Gallery</h3>
+          <p style="margin-bottom: 14px; font-size: 11px; color: var(--text-secondary);">Click on any picture to open Quick Look preview. Use Arrow keys to navigate.</p>
+          <div class="finder-photo-grid">
+            ${gridHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    function getFinderGorkhaHTML() {
+      return `
+        <div class="finder-section" style="padding: 10px;">
+          <div class="location-hero" style="background: linear-gradient(135deg, rgba(255, 75, 43, 0.1), rgba(255, 65, 108, 0.15)); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(255, 75, 43, 0.15);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="background: #ff4b2b; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Historical Epicenter</span>
+              <span style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Elevation: ~1,135m</span>
+            </div>
+            <h3 style="margin: 0 0 6px 0; font-size: 1.8rem; font-weight: 700; color: var(--text-color); border: none; padding: 0;">Gorkha</h3>
+            <p style="margin: 0; font-size: 0.95rem; opacity: 0.9; font-weight: 600; color: #ff4b2b;">Haramtari, Gorkha • Gandaki Province, Nepal</p>
+          </div>
+
+          <div class="location-grid" style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px;">
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 10px;">
+              <h4 style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-color);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4b2b" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                The Birthplace of Modern Nepal
+              </h4>
+              <p style="margin: 0; font-size: 0.9rem; line-height: 1.6; opacity: 0.75;">
+                Gorkha holds a legendary place in Nepalese history as the seat of the historic Gorkha Kingdom. It is the proud birthplace of King Prithvi Narayan Shah, who initiated the unification campaign of the nation in the 18th century. The region gave rise to the world-renowned "Gurkha" soldiers, celebrated globally for their peerless bravery, resilience, and honor.
+              </p>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 10px;">
+              <h4 style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-color);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4b2b" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Legendary Heritage & Wonders
+              </h4>
+              <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; line-height: 1.6; opacity: 0.75;">
+                <li style="margin-bottom: 6px;"><strong>Gorkha Durbar:</strong> An architectural masterpiece perched on a knife-edge ridge, functioning as both a fortified palace and a sacred temple complex.</li>
+                <li style="margin-bottom: 6px;"><strong>Gorakhnath Cave:</strong> A revered holy cavern dedicated to the sage Gorakhnath, the guardian deity of the royal clan.</li>
+                <li><strong>Panoramic Vistas:</strong> Spectacular overlooking views of Mt. Manaslu, the Ganesh Himal, and the deep, winding valleys below.</li>
+              </ul>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 10px;">
+              <h4 style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-color);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4b2b" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Personal Significance
+              </h4>
+              <p style="margin: 0; font-size: 0.9rem; line-height: 1.6; opacity: 0.75;">
+                Growing up amidst the historic hills of Haramtari, Gorkha has instilled in me a profound sense of heritage, resilience, and adaptability. The surrounding majestic mountain scenery and rich history continue to inspire my drive for innovation, engineering excellence, and crafting robust digital landscapes.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getFinderMadhyapurHTML() {
+      return `
+        <div class="finder-section" style="padding: 10px;">
+          <div class="location-hero" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.15)); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(245, 158, 11, 0.15);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="background: #d97706; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">Cultural & Pottery Hub</span>
+              <span style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">Kathmandu Valley</span>
+            </div>
+            <h3 style="margin: 0 0 6px 0; font-size: 1.8rem; font-weight: 700; color: var(--text-color); border: none; padding: 0;">Madhyapur Thimi</h3>
+            <p style="margin: 0; font-size: 0.95rem; opacity: 0.9; font-weight: 600; color: #d97706;">Thimi • Bagmati Province, Nepal</p>
+          </div>
+
+          <div class="location-grid" style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px;">
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 10px;">
+              <h4 style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-color);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Heritage, Pottery & Living Art
+              </h4>
+              <p style="margin: 0; font-size: 0.9rem; line-height: 1.6; opacity: 0.75;">
+                Madhyapur Thimi is a highly vibrant and historic Newari city in the Kathmandu Valley, famed as the "Town of Pottery". It is celebrated for preserving centuries-old arts, terracottas, and hand-molded clay crafts. The city comes alive with rich traditional festivals, most famously the Biska Jatra, marked by vibrant colors, music, and chariot processions.
+              </p>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 10px;">
+              <h4 style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-color);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Famed Cultural Treasures
+              </h4>
+              <ul style="margin: 0; padding-left: 20px; font-size: 0.9rem; line-height: 1.6; opacity: 0.75;">
+                <li style="margin-bottom: 6px;"><strong>Pottery Squares:</strong> Sprawling open courtyards where thousands of hand-crafted clay vessels bake under the warm Nepalese sun.</li>
+                <li style="margin-bottom: 6px;"><strong>Biska Jatra & Sindoor Jatra:</strong> A spectacular festival celebrating the Nepalese New Year, where participants shower each other in vibrant vermillion powder.</li>
+                <li><strong>Siddha Pokhari:</strong> An ancient, tranquil stone-lined pond dating back to the Malla era, reflecting peace and architectural genius.</li>
+              </ul>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 10px;">
+              <h4 style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text-color);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Professional Growth Hub
+              </h4>
+              <p style="margin: 0; font-size: 0.9rem; line-height: 1.6; opacity: 0.75;">
+                Acting as a bridge between the historic culture of Bhaktapur and the high-tech modern hub of Kathmandu, Madhyapur Thimi represents a balance of traditional heritage and forward-looking digital innovation. It serves as my base for development, continuous learning, and launching modern high-performance web applications.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // ============================================
+    // TERMINAL APP
+    // ============================================
+    function setupTerminal(el) {
+      const content = el.querySelector('.mac-window-content');
+      content.style.padding = '0';
+      content.innerHTML = `
+        <div class="terminal-body" id="terminal-body">
+          <div class="terminal-output" id="terminal-output"></div>
+          <div class="terminal-prompt-line">
+            <span class="terminal-prompt">sujal@portfolio-os ~ %</span>
+            <input type="text" class="terminal-input" id="terminal-input" autocomplete="off" spellcheck="false" autofocus>
+          </div>
+          <canvas class="terminal-canvas" id="terminal-canvas"></canvas>
+        </div>
+      `;
+
+      const input = content.querySelector('#terminal-input');
+      const output = content.querySelector('#terminal-output');
+      const canvas = content.querySelector('#terminal-canvas');
+      let isMatrixRunning = false;
+      let matrixAnimationId = null;
+
+      // Initial message
+      appendTerminalOutput(output, 'Welcome to Portfolio OS v1.0', 'info');
+      appendTerminalOutput(output, 'Type "help" to see available commands.\n', 'info');
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const cmd = input.value.trim();
+          input.value = '';
+          if (cmd) handleTerminalCommand(cmd, output, canvas, () => isMatrixRunning, (v) => { isMatrixRunning = v; });
+        }
+      });
+
+      // Auto-focus terminal when window is focused
+      el.addEventListener('mousedown', () => {
+        setTimeout(() => input.focus(), 50);
+      });
+    }
+
+    function appendTerminalOutput(output, text, type = 'info') {
+      const div = document.createElement('div');
+      div.className = 'terminal-output-line terminal-output-' + type;
+      // Handle multi-line
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      output.appendChild(div);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function handleTerminalCommand(cmd, output, canvas, getMatrixState, setMatrixState) {
+      const lower = cmd.toLowerCase();
+
+      // Echo command
+      const echoDiv = document.createElement('div');
+      echoDiv.className = 'terminal-output-line';
+      echoDiv.innerHTML = `<span class="terminal-prompt">sujal@portfolio-os ~ %</span> ${cmd}`;
+      output.appendChild(echoDiv);
+
+      if (lower === 'clear') {
+        output.innerHTML = '';
+        if (getMatrixState()) {
+          setMatrixState(false);
+          cancelAnimationFrame(matrixAnimationId);
+          canvas.classList.remove('active');
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        return;
+      }
+
+      if (lower === 'hack') {
+        output.innerHTML = '';
+        setMatrixState(true);
+        canvas.classList.add('active');
+        startMatrixRain(canvas, getMatrixState);
+        return;
+      }
+
+      if (lower === 'coffee') {
+        appendTerminalOutput(output, getCoffeeASCII(), 'info');
+        return;
+      }
+
+      if (TERMINAL_COMMANDS[lower]) {
+        appendTerminalOutput(output, TERMINAL_COMMANDS[lower], 'info');
+      } else {
+        appendTerminalOutput(output, `zsh: command not found: ${cmd}`, 'error');
+      }
+    }
+
+    function getCoffeeASCII() {
+      return `
+        ( (      ) )      ( (
+         ) )    ( (        ) )
+        ( (   ___ ___    ( (
+         ) )  |   |   |    ) )
+        ( (   |   |   |   ( (
+         ) )  |   |   |    ) )
+        ( (   |___|___|   ( (
+         ) )  /       \\    ) )
+        ( (  |  ☕☕☕  |  ( (
+         ) )  \\_______/    ) )
+              |       |
+              |       |
+              |_______|
+
+        Coffee break time! ☕☕☕`;
+    }
+
+    let matrixAnimationId = null;
+    function startMatrixRain(canvas, getMatrixState) {
+      const ctx = canvas.getContext('2d');
+      const body = canvas.parentElement;
+      canvas.width = body.clientWidth;
+      canvas.height = body.clientHeight;
+
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ';
+      const fontSize = 14;
+      const columns = Math.floor(canvas.width / fontSize);
+      const drops = Array(columns).fill(0).map(() => Math.random() * -100);
+
+      function draw() {
+        if (!getMatrixState()) return;
+
+        ctx.fillStyle = 'rgba(30, 30, 30, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#00FF41';
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < drops.length; i++) {
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+
+        matrixAnimationId = requestAnimationFrame(draw);
+      }
+
+      draw();
+    }
+
+    // ============================================
+    // SAFARI APP
+    // ============================================
+    function setupSafari(el) {
+      const content = el.querySelector('.mac-window-content');
+      content.style.padding = '0';
+      content.style.display = 'flex';
+      content.style.flexDirection = 'column';
+
+      content.innerHTML = `
+        <div class="safari-tabs">
+          <button class="safari-tab active" data-tab="web">Projects</button>
+        </div>
+        <div class="safari-chrome">
+          <button class="safari-nav-btn" title="Back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button class="safari-nav-btn" title="Forward">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <button class="safari-nav-btn" title="Refresh">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+          </button>
+          <div class="safari-address-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span class="url">projects.sujalkunwar.com.np</span>
+          </div>
+        </div>
+        <div class="safari-content" id="safari-content">
+          ${getSafariWebProjectsHTML()}
+        </div>
+      `;
+
+      content.querySelectorAll('.safari-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          content.querySelectorAll('.safari-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          const safariContent = content.querySelector('#safari-content');
+          if (tab.dataset.tab === 'web') safariContent.innerHTML = getSafariWebProjectsHTML();
+          if (tab.dataset.tab === 'curriculum') safariContent.innerHTML = getSafariCurriculumHTML();
+        });
+      });
+    }
+
+    function getSafariWebProjectsHTML() {
+      return `
+        <div class="safari-projects-grid">
+          <div class="project-card">
+            <div class="project-card-image" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); display:flex;align-items:center;justify-content:center;">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+            </div>
+            <div class="project-card-body">
+              <h4>Service Management System</h4>
+              <p>A comprehensive Java-based system for managing service requests and customer interactions. Features include service tracking, automated notifications, and detailed reporting capabilities.</p>
+              <div class="project-card-badges">
+                <span class="project-badge">Java</span>
+                <span class="project-badge">Service Tracking</span>
+                <span class="project-badge">Reporting</span>
+              </div>
+              <div class="project-card-actions">
+                <a class="project-btn" href="https://github.com/sujalkunwar22/Service-Management-System.git" target="_blank">Source Code</a>
+              </div>
+            </div>
+          </div>
+          <div class="project-card">
+            <div class="project-card-image" style="background: linear-gradient(135deg, #0f3460 0%, #4FC3F7 100%); display:flex;align-items:center;justify-content:center;">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            </div>
+            <div class="project-card-body">
+              <h4>Weather Forecaster</h4>
+              <p>A dynamic weather application that provides real-time weather updates and forecasts. Built with modern web technologies, it offers an intuitive interface for checking weather conditions worldwide.</p>
+              <div class="project-card-badges">
+                <span class="project-badge">JavaScript</span>
+                <span class="project-badge">Weather API</span>
+                <span class="project-badge">Responsive</span>
+              </div>
+              <div class="project-card-actions">
+                <a class="project-btn" href="https://weather-steel-kappa-11.vercel.app/" target="_blank">Live Demo</a>
+                <a class="project-btn" href="https://github.com/sujalkunwar22/weather-app.git" target="_blank">Source Code</a>
+              </div>
+            </div>
+          </div>
+          <div class="project-card">
+            <div class="project-card-image" style="background: linear-gradient(135deg, #1b4332 0%, #52b788 100%); display:flex;align-items:center;justify-content:center;">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="1" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="project-card-body">
+              <h4>Canteen Expenses Tracker</h4>
+              <p>A Python-based application for tracking and managing canteen expenses. Features include expense logging, budget management, and detailed financial reports with data stored in JSON format.</p>
+              <div class="project-card-badges">
+                <span class="project-badge">Python</span>
+                <span class="project-badge">JSON</span>
+                <span class="project-badge">Budget Management</span>
+              </div>
+              <div class="project-card-actions">
+                <a class="project-btn" href="https://github.com/sujalkunwar22/canteen.git" target="_blank">Source Code</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getSafariCurriculumHTML() {
+      return getSafariWebProjectsHTML();
+    }
+
+    // ============================================
+    // MAIL APP
+    // ============================================
+    function setupMail(el) {
+      const content = el.querySelector('.mac-window-content');
+      content.style.padding = '0';
+      content.style.position = 'relative';
+
+      content.innerHTML = `
+        <div class="mail-body">
+          <div class="mail-form" id="mail-form">
+            <div class="mail-field">
+              <label>From:</label>
+              <span class="readonly">sujalkunwar22@gmail.com</span>
+            </div>
+            <div class="mail-field">
+              <label>To:</label>
+              <input type="text" id="mail-to" placeholder="visitor@guest.com" value="visitor@guest.com">
+            </div>
+            <div class="mail-field">
+              <label>Subject:</label>
+              <span class="readonly">Let's work together on your next project!</span>
+            </div>
+            <textarea class="mail-body-area" id="mail-body-text" placeholder="Hi Sujal,\n\nI'd love to work with you on...\n\nLet's discuss how we can collaborate!"></textarea>
+          </div>
+          <div class="mail-success" id="mail-success">
+            <div class="mail-success-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3>Message Sent Successfully!</h3>
+            <p>Thank you for reaching out.</p>
+          </div>
+        </div>
+        <div class="mail-actions">
+          <button class="mail-send-btn" id="mail-send-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            Send Message
+          </button>
+        </div>
+      `;
+
+      const sendBtn = content.querySelector('#mail-send-btn');
+      const mailForm = content.querySelector('#mail-form');
+      const mailSuccess = content.querySelector('#mail-success');
+      const mailTo = content.querySelector('#mail-to');
+      const mailBodyText = content.querySelector('#mail-body-text');
+
+      sendBtn.addEventListener('click', () => {
+        // Validate
+        const toVal = mailTo.value.trim();
+        const bodyVal = mailBodyText.value.trim();
+        const emailRegex = /^\S+@\S+\.\S+$/;
+
+        if (!emailRegex.test(toVal) || !bodyVal) {
+          mailForm.classList.add('shake');
+          setTimeout(() => mailForm.classList.remove('shake'), 400);
+          return;
+        }
+
+        // Success animation
+        mailForm.classList.add('sent');
+        setTimeout(() => {
+          mailSuccess.classList.add('show');
+        }, 200);
+
+        showNotification('Message Sent Successfully!');
+      });
+    }
+
+    // ============================================
+    // MENU BAR ACTION HANDLER
+    // ============================================
+    function handleMenuAction(action) {
+      // Close all dropdowns
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+
+      switch (action) {
+        case 'open-finder':   handleAppLaunch('finder');   break;
+        case 'open-safari':   handleAppLaunch('safari');   break;
+        case 'open-terminal': handleAppLaunch('terminal'); break;
+        case 'open-mail':     handleAppLaunch('mail');     break;
+        
+        case 'new-window': {
+          if (activeWindow && windows[activeWindow]) {
+            openWindow(windows[activeWindow].appName);
+          } else {
+            openWindow('finder');
+          }
+          break;
+        }
+
+        case 'close-window':
+          if (activeWindow) closeWindow(activeWindow);
+          break;
+
+        case 'close-all':
+          Object.keys(windows).forEach(id => {
+            if (!windows[id].isClosed) closeWindow(id);
+          });
+          break;
+
+        case 'minimize-all':
+          Object.keys(windows).forEach(id => {
+            if (!windows[id].isClosed && !windows[id].isMinimized) minimizeWindow(id);
+          });
+          break;
+
+        case 'toggle-theme':
+          toggleTheme();
+          break;
+
+        case 'tile-windows': {
+          const wins = [...document.querySelectorAll('.mac-window:not(.minimized)')];
+          if (wins.length === 0) break;
+          const W = window.innerWidth, H = window.innerHeight - 28 - 80;
+          const cols = Math.ceil(Math.sqrt(wins.length));
+          const rows = Math.ceil(wins.length / cols);
+          const w = Math.floor(W / cols), h = Math.floor(H / rows);
+          wins.forEach((win, i) => {
+            const col = i % cols, row = Math.floor(i / cols);
+            win.style.left = (col * w) + 'px';
+            win.style.top  = (28 + row * h) + 'px';
+            win.style.width  = w + 'px';
+            win.style.height = h + 'px';
+          });
+          break;
+        }
+
+        case 'goto-github':
+          window.open('https://github.com/sujalkunwar22', '_blank');
+          break;
+
+        case 'goto-portfolio':
+          window.open('https://sujalkunwar.com.np', '_blank');
+          break;
+
+        case 'select-all':
+          document.execCommand('selectAll');
+          break;
+
+        case 'show-status-bar':
+          // Toggle a simple status message
+          const bar = document.getElementById('statusBar');
+          if (bar) { bar.remove(); break; }
+          const sb = document.createElement('div');
+          sb.id = 'statusBar';
+          sb.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;z-index:9999;backdrop-filter:blur(10px);';
+          sb.textContent = 'Portfolio OS v1.0 — Sujal Kunwar';
+          document.body.appendChild(sb);
+          setTimeout(() => sb.remove(), 3000);
+          break;
+      }
+    }
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    function setupEventListeners() {
+      // Theme toggle (MenuBar + Control Center)
+      themeToggle.addEventListener('click', toggleTheme);
+      const ccThemeBox = $('ccThemeBox');
+      if (ccThemeBox) {
+        ccThemeBox.addEventListener('click', toggleTheme);
+      }
+
+      // Spotlight
+      $('spotlightBtn').addEventListener('click', openSpotlight);
+      spotlightOverlay.addEventListener('click', (e) => {
+        if (e.target === spotlightOverlay) closeSpotlight();
+      });
+      spotlightInput.addEventListener('input', (e) => {
+        handleSpotlightSearch(e.target.value);
+      });
+
+      // Clock
+      menuClock.addEventListener('click', toggleClockDropdown);
+
+      // Desktop click to blur
+      desktop.addEventListener('mousedown', () => {
+        document.querySelectorAll('.mac-window').forEach(w => w.classList.remove('active'));
+        activeWindow = null;
+        menuAppName.textContent = 'Finder';
+
+        // Reset File menu item
+        const fileNewItem = document.querySelector('#dropFile [data-action="new-window"]');
+        if (fileNewItem) {
+          fileNewItem.innerHTML = `New Finder Window <span class="shortcut">⌘N</span>`;
+        }
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        // Spotlight: Cmd+K or Ctrl+K
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          if (spotlightOverlay.classList.contains('active')) {
+            closeSpotlight();
+          } else {
+            openSpotlight();
+          }
+        }
+
+        // Escape
+        if (e.key === 'Escape') {
+          if (spotlightOverlay.classList.contains('active')) {
+            closeSpotlight();
+          } else if (clockDropdown.classList.contains('show')) {
+            clockDropdown.classList.remove('show');
+          }
+        }
+
+        // Close window: Cmd+W
+        if ((e.metaKey || e.ctrlKey) && e.key === 'w' && activeWindow) {
+          e.preventDefault();
+          closeWindow(activeWindow);
+        }
+
+        // Minimize: Cmd+M
+        if ((e.metaKey || e.ctrlKey) && e.key === 'm' && activeWindow) {
+          e.preventDefault();
+          minimizeWindow(activeWindow);
+        }
+
+        // New window: Cmd+N
+        if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+          e.preventDefault();
+          handleMenuAction('new-window');
+        }
+      });
+
+      // Dock clicks
+      document.querySelectorAll('.dock-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const app = item.dataset.app;
+          if (app === 'settings') {
+            toggleTheme();
+            return;
+          }
+          handleAppLaunch(app);
+        });
+      });
+
+      // Clock outside click
+      document.addEventListener('click', (e) => {
+        if (!menuClock.contains(e.target) && !clockDropdown.contains(e.target)) {
+          clockDropdown.classList.remove('show');
+        }
+      });
+
+      // Responsive check
+      window.addEventListener('resize', () => {
+        isMobile = window.innerWidth <= 768;
+      });
+
+      // ── Menu Bar Dropdowns ──────────────────────────────────────────
+      const menuItems = document.querySelectorAll('.menu-item');
+
+      // Toggle active on click
+      menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isActive = item.classList.contains('active');
+          // Close all first
+          menuItems.forEach(m => m.classList.remove('active'));
+          if (!isActive) item.classList.add('active');
+        });
+      });
+
+      // Close menus when clicking outside
+      document.addEventListener('click', () => {
+        menuItems.forEach(m => m.classList.remove('active'));
+      });
+
+      // Prevent dropdown clicks from bubbling up to document
+      document.querySelectorAll('.menu-dropdown').forEach(dd => {
+        dd.addEventListener('click', e => e.stopPropagation());
+      });
+
+      // Wire up all dropdown items
+      document.querySelectorAll('.menu-dropdown-item[data-action]').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleMenuAction(item.dataset.action);
+        });
+      });
+
+      // Keyboard shortcuts for menus and Quick Look
+      document.addEventListener('keydown', (e) => {
+        const overlay = document.getElementById('quickLookOverlay');
+        if (overlay && overlay.classList.contains('active')) {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            window.closeQuickLook();
+          }
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            window.showNextPhoto();
+          }
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            window.showPrevPhoto();
+          }
+          return;
+        }
+
+        if (e.metaKey || e.ctrlKey) {
+          if (e.key === '1') { e.preventDefault(); handleAppLaunch('finder'); }
+          if (e.key === '2') { e.preventDefault(); handleAppLaunch('safari'); }
+          if (e.key === '3') { e.preventDefault(); handleAppLaunch('terminal'); }
+          if (e.key === '4') { e.preventDefault(); handleAppLaunch('mail'); }
+        }
+        // Close menus on Escape
+        if (e.key === 'Escape') {
+          menuItems.forEach(m => m.classList.remove('active'));
+        }
+      });
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    function init() {
+      initTheme();
+      updateClock();
+      setInterval(updateClock, 60000);
+      setupEventListeners();
+      loadDynamicPhotos();
+      startBootSequence();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  })();
+  </script>
+</body>
+</html>
