@@ -76,7 +76,7 @@
       --border-glass: rgba(255, 255, 255, 0.1);
       --shadow-window: 0 22px 70px rgba(0,0,0,0.45), 0 8px 20px rgba(0,0,0,0.25);
       --shadow-window-inactive: 0 12px 40px rgba(0,0,0,0.20), 0 4px 12px rgba(0,0,0,0.12);
-      --bg-wallpaper: url('dark.jpg');
+      --bg-wallpaper: url('dark-clean.png');
     }
 
     html, body {
@@ -1040,6 +1040,30 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
       margin-top: 15px;
+    }
+
+    .ios-mode .finder-photo-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+      margin-top: 0;
+      padding: 0 !important;
+    }
+
+    .ios-mode .finder-photo-card {
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      aspect-ratio: 1 / 1;
+    }
+
+    .ios-mode .finder-photo-card:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: transparent;
+    }
+
+    .ios-mode .finder-photo-card img {
+      border-radius: 0;
     }
 
     .finder-photo-card {
@@ -2204,6 +2228,456 @@
       width: 16px;
       height: 16px;
     }
+
+    /* ==========================================
+       iOS Mobile Override System (<= 768px)
+       ========================================== */
+    .ios-status-bar,
+    .ios-home-screen,
+    .ios-home-indicator,
+    .ios-dock-wrapper {
+      display: none;
+    }
+
+    .ios-mode .ios-status-bar {
+      display: flex;
+    }
+    .ios-mode .ios-home-screen {
+      display: flex;
+    }
+    .ios-mode .ios-home-indicator {
+      display: block;
+    }
+    .ios-mode .ios-dock-wrapper {
+      display: flex;
+    }
+
+    /* Hide macOS Desktop Elements in iOS Mode */
+    .ios-mode #menuBar,
+    .ios-mode .menu-bar,
+    .ios-mode #dock,
+    .ios-mode .dock,
+    .ios-mode .desktop-icon,
+    .ios-mode .desktop .folder-icon,
+    .ios-mode .desktop-widgets,
+    .ios-mode .clock-dropdown {
+      display: none !important;
+    }
+
+    /* iOS Status Bar Styling */
+    .ios-status-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      padding: 0 20px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      color: #ffffff;
+      z-index: 10000;
+      font-size: 14px;
+      font-weight: 600;
+      pointer-events: none;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .ios-status-bar-left, .ios-status-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ios-status-icon {
+      width: 17px;
+      height: 17px;
+    }
+
+    .ios-battery {
+      width: 24px;
+      height: 12px;
+      border: 1px solid #ffffff;
+      border-radius: 3px;
+      padding: 1px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    .ios-battery::after {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 3px;
+      width: 2px;
+      height: 4px;
+      background: #ffffff;
+      border-radius: 0 1px 1px 0;
+    }
+
+    .ios-battery-level {
+      height: 100%;
+      background: #ffffff;
+      border-radius: 1px;
+      transition: width 0.3s;
+    }
+
+    /* iOS Home Screen Styling */
+    .ios-home-screen {
+      position: fixed;
+      top: 44px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 16px 40px;
+      box-sizing: border-box;
+      z-index: 5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .ios-app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 16px;
+      width: 100%;
+      max-width: 400px;
+      padding: 10px 0;
+      box-sizing: border-box;
+      justify-items: center;
+    }
+
+    .ios-app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      width: 72px;
+      transition: transform 0.2s;
+    }
+
+    .ios-app-item:active {
+      transform: scale(0.9);
+    }
+
+    .ios-app-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 13.5px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+      background: #ffffff;
+    }
+
+    .ios-app-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ios-app-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    /* iOS Dock Styling */
+    .ios-dock-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .ios-dock {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      padding: 12px 16px;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 320px;
+      box-sizing: border-box;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    [data-theme="dark"] .ios-dock {
+      background: rgba(0, 0, 0, 0.35);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .ios-dock-item {
+      width: 56px;
+      height: 56px;
+      border-radius: 12.5px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .ios-dock-item:active {
+      transform: scale(0.9);
+    }
+
+    .ios-dock-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* iOS Home Indicator */
+    .ios-home-indicator {
+      position: fixed;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 100px;
+      z-index: 11000;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .ios-home-indicator:active {
+      background: rgba(255, 255, 255, 1);
+    }
+
+    /* iOS Window Shell Style Overrides */
+    .ios-mode .mac-window {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      z-index: 1000 !important;
+      transform: translateY(100%);
+      transition: transform 0.38s cubic-bezier(0.1, 0.76, 0.55, 0.94) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      background: var(--bg-card) !important;
+      overflow: hidden !important;
+    }
+
+    .ios-mode .mac-window.active {
+      transform: translateY(0) !important;
+    }
+
+    .ios-mode .mac-window.minimized {
+      transform: translateY(100%) !important;
+      display: flex !important;
+    }
+
+    .ios-mode .mac-window .title-bar-controls {
+      display: none !important;
+    }
+
+    .ios-mode .mac-window .mac-window-titlebar {
+      display: none !important;
+    }
+
+    .ios-mode .mac-window .traffic-lights {
+      display: none !important;
+    }
+
+    .mac-window .ios-back-btn {
+      display: none;
+    }
+
+    .ios-mode .mac-window .mac-window-content {
+      flex: 1 !important;
+      height: 100% !important;
+      overflow-y: auto !important;
+      padding-bottom: 40px !important;
+      box-sizing: border-box !important;
+      padding-top: 0 !important;
+    }
+
+    /* iOS window home indicator for swipe-up gesture */
+    .ios-window-indicator {
+      display: none;
+    }
+
+    .ios-mode .ios-window-indicator {
+      display: block;
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 100px;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] .ios-mode .ios-window-indicator {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    /* iOS-style swipe feedback */
+    .ios-mode .mac-window.swiping {
+      transition: none !important;
+    }
+
+    .ios-mode .mac-window.swipe-closing {
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.3s ease, border-radius 0.3s ease !important;
+      transform: translateY(100%) scale(0.9) !important;
+      opacity: 0 !important;
+    }
+
+    /* Finder iOS sliding styles */
+    .ios-mode .finder-layout {
+      position: relative;
+      width: 100% !important;
+      height: 100% !important;
+      display: block !important;
+      overflow: hidden;
+    }
+
+    .ios-mode .finder-sidebar {
+      width: 100% !important;
+      height: 100% !important;
+      background: var(--bg-card) !important;
+      padding: 16px !important;
+      box-sizing: border-box !important;
+      overflow-y: auto !important;
+      border-right: none !important;
+      transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94) !important;
+      transform: translateX(0) !important;
+    }
+
+    .ios-mode .finder-layout.detail-active .finder-sidebar {
+      transform: translateX(-100%) !important;
+    }
+
+    .ios-mode .finder-sidebar-section {
+      margin-bottom: 24px !important;
+    }
+
+    .ios-mode .finder-sidebar-section-title {
+      font-size: 13px !important;
+      text-transform: uppercase !important;
+      color: var(--text-secondary) !important;
+      margin-left: 8px !important;
+      margin-bottom: 6px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.3px !important;
+    }
+
+    .ios-mode .finder-sidebar-list {
+      background: rgba(120, 120, 128, 0.08) !important;
+      border-radius: 12px !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+      display: flex;
+      flex-direction: column;
+    }
+
+    [data-theme="dark"] .ios-mode .finder-sidebar-list {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .ios-mode .finder-sidebar-item {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      padding: 12px 14px !important;
+      font-size: 16px !important;
+      color: var(--text-primary) !important;
+      border-bottom: 1px solid rgba(120, 120, 128, 0.15) !important;
+      background: none !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      cursor: pointer !important;
+      transition: background 0.2s !important;
+    }
+
+    .ios-mode .finder-sidebar-item:last-child {
+      border-bottom: none !important;
+    }
+
+    .ios-mode .finder-sidebar-item:active {
+      background: rgba(120, 120, 128, 0.15) !important;
+    }
+
+    .ios-mode .finder-sidebar-item.active {
+      background: rgba(120, 120, 128, 0.1) !important;
+      color: var(--text-primary) !important;
+    }
+
+    .sidebar-item-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .ios-mode .finder-sidebar-item .sidebar-item-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ios-mode .finder-sidebar-item::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-top: 2px solid var(--text-secondary);
+      border-right: 2px solid var(--text-secondary);
+      transform: rotate(45deg);
+      opacity: 0.6;
+    }
+
+    .ios-mode .finder-main {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: var(--bg-card) !important;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+      z-index: 10;
+      display: flex !important;
+      flex-direction: column !important;
+      padding: 0 !important;
+    }
+
+    .ios-mode .finder-layout.detail-active .finder-main {
+      transform: translateX(0);
+    }
+
+    .ios-mode .finder-main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px !important;
+      box-sizing: border-box;
+      padding-bottom: 40px !important;
+    }
   </style>
 </head>
 <body>
@@ -2542,6 +3016,75 @@
   <!-- Windows Container -->
   <div class="windows-container" id="windowsContainer"></div>
 
+  <!-- iOS Status Bar -->
+  <div class="ios-status-bar" id="iosStatusBar">
+    <div class="ios-status-bar-left">
+      <span class="ios-time" id="iosTime">9:41</span>
+    </div>
+    <div class="ios-status-bar-right">
+      <svg class="ios-status-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M2 22h3v-3H2v3zm5 0h3v-6H7v6zm5 0h3v-10h-3v10zm5 0h3V6h-3v16z"/></svg>
+      <svg class="ios-status-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 20h.01M2 8.82a15 15 0 0 1 20 0M5 12.859a10 10 0 0 1 14 0M8.5 16.429a5 5 0 0 1 7 0"/></svg>
+      <div class="ios-battery" id="iosBattery">
+        <div class="ios-battery-level" id="iosBatteryLevel" style="width: 100%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- iOS Home Screen -->
+  <div class="ios-home-screen" id="iosHomeScreen">
+    <div class="ios-app-grid">
+      <div class="ios-app-item" data-app="finder">
+        <div class="ios-app-icon finder">
+          <img src="finder.png" alt="Files">
+        </div>
+        <span class="ios-app-label">Files</span>
+      </div>
+      <div class="ios-app-item" data-app="safari">
+        <div class="ios-app-icon safari">
+          <img src="safari.png" alt="Safari">
+        </div>
+        <span class="ios-app-label">Safari</span>
+      </div>
+      <div class="ios-app-item" data-app="terminal">
+        <div class="ios-app-icon terminal">
+          <img src="terminal.png" alt="Terminal">
+        </div>
+        <span class="ios-app-label">Terminal</span>
+      </div>
+      <div class="ios-app-item" data-app="mail">
+        <div class="ios-app-icon mail">
+          <img src="mail.png" alt="Mail">
+        </div>
+        <span class="ios-app-label">Mail</span>
+      </div>
+      <div class="ios-app-item" data-app="settings">
+        <div class="ios-app-icon settings">
+          <img src="settings.png" alt="Settings">
+        </div>
+        <span class="ios-app-label">Settings</span>
+      </div>
+    </div>
+    <div class="ios-dock-wrapper">
+      <div class="ios-dock">
+        <div class="ios-dock-item" data-app="finder">
+          <img src="finder.png" alt="Files">
+        </div>
+        <div class="ios-dock-item" data-app="safari">
+          <img src="safari.png" alt="Safari">
+        </div>
+        <div class="ios-dock-item" data-app="terminal">
+          <img src="terminal.png" alt="Terminal">
+        </div>
+        <div class="ios-dock-item" data-app="mail">
+          <img src="mail.png" alt="Mail">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- iOS Home Indicator -->
+  <div class="ios-home-indicator" id="iosHomeIndicator"></div>
+
   <!-- Dock -->
   <div class="dock" id="dock">
     <div class="dock-item" data-app="finder" title="Finder">
@@ -2748,14 +3291,16 @@
               desktop.classList.add('booted');
             }, 900);
 
-            // Phase 6: Menu bar and Dock slide in gracefully
-            setTimeout(() => {
-              menuBar.classList.add('visible');
-            }, 1300);
+            // Phase 6: Menu bar and Dock slide in gracefully (desktop only)
+            if (!isMobile) {
+              setTimeout(() => {
+                menuBar.classList.add('visible');
+              }, 1300);
 
-            setTimeout(() => {
-              dock.classList.add('visible');
-            }, 1500);
+              setTimeout(() => {
+                dock.classList.add('visible');
+              }, 1500);
+            }
 
             // Phase 7: Clean up boot screen and open Finder
             setTimeout(() => {
@@ -2785,8 +3330,10 @@
     function skipBoot() {
       bootScreen.style.display = 'none';
       desktop.classList.add('booted');
-      menuBar.classList.add('visible');
-      dock.classList.add('visible');
+      if (!isMobile) {
+        menuBar.classList.add('visible');
+        dock.classList.add('visible');
+      }
       setTimeout(() => openWindow('finder'), 200);
     }
 
@@ -2822,6 +3369,65 @@
     }
 
     // ============================================
+    // iOS UTILITIES
+    // ============================================
+    function updateIosStatusBar() {
+      updateClock();
+    }
+
+    function initBattery() {
+      const batteryPercentText = $('batteryPercentText');
+      const batteryPercentBig = $('batteryPercentBig');
+      const batteryStatusText = $('batteryStatusText');
+      const iosBatteryLevel = $('iosBatteryLevel');
+
+      function updateBatteryUI(level, charging) {
+        const pct = Math.round(level * 100) + '%';
+        if (batteryPercentText) batteryPercentText.textContent = pct;
+        if (batteryPercentBig) batteryPercentBig.textContent = pct;
+        if (iosBatteryLevel) {
+          iosBatteryLevel.style.width = pct;
+          if (charging) {
+            iosBatteryLevel.style.backgroundColor = '#34c759';
+          } else if (level <= 0.2) {
+            iosBatteryLevel.style.backgroundColor = '#ff3b30';
+          } else {
+            iosBatteryLevel.style.backgroundColor = '';
+          }
+        }
+        if (batteryStatusText) {
+          batteryStatusText.textContent = charging ? 'Power Source: Power Adapter' : 'Power Source: Battery';
+        }
+      }
+
+      if (navigator.getBattery) {
+        navigator.getBattery().then(battery => {
+          updateBatteryUI(battery.level, battery.charging);
+          battery.addEventListener('levelchange', () => updateBatteryUI(battery.level, battery.charging));
+          battery.addEventListener('chargingchange', () => updateBatteryUI(battery.level, battery.charging));
+        });
+      } else {
+        updateBatteryUI(0.88, false);
+      }
+    }
+
+    function closeAllActiveWindows() {
+      Object.keys(windows).forEach(winId => {
+        if (!windows[winId].isClosed && !windows[winId].isMinimized) {
+          minimizeWindow(winId);
+        }
+      });
+    }
+
+    function closeAllOtherActiveWindows(exceptWindowId) {
+      Object.keys(windows).forEach(winId => {
+        if (winId !== exceptWindowId && !windows[winId].isClosed && !windows[winId].isMinimized) {
+          minimizeWindow(winId);
+        }
+      });
+    }
+
+    // ============================================
     // CLOCK SYSTEM
     // ============================================
     function updateClock() {
@@ -2831,6 +3437,11 @@
       const ampm = hours >= 12 ? 'PM' : 'AM';
       const h12 = hours % 12 || 12;
       menuClock.textContent = `${h12}:${minutes} ${ampm}`;
+      
+      const iosTime = $('iosTime');
+      if (iosTime) {
+        iosTime.textContent = `${h12}:${minutes}`;
+      }
     }
 
     function updateCalendar() {
@@ -2954,6 +3565,16 @@
     }
 
     function handleAppLaunch(appName) {
+      if (isMobile) {
+        const openWindows = Object.values(windows)
+          .filter(w => w.appName === appName && !w.isClosed);
+        if (openWindows.length > 0) {
+          closeAllOtherActiveWindows(openWindows[0].id);
+        } else {
+          closeAllActiveWindows();
+        }
+      }
+
       const openWindows = Object.values(windows)
         .filter(w => w.appName === appName && !w.isClosed)
         .sort((a, b) => b.zIndex - a.zIndex);
@@ -2982,6 +3603,10 @@
       const app = APPS[appName];
       if (!app) return;
 
+      if (isMobile) {
+        closeAllActiveWindows();
+      }
+
       const windowId = `${appName}-${nextWindowId++}`;
       const winEl = createWindowElement(windowId, app, appName);
       windowsContainer.appendChild(winEl);
@@ -2998,17 +3623,19 @@
         zIndex: nextZ,
       };
 
-      // Position with cascade
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const x = Math.min(40 + windowOffset, vw - app.width - 40);
-      const y = Math.min(40 + windowOffset + 28, vh - app.height - 100);
-      windowOffset = (windowOffset + 30) % 120;
+      if (!isMobile) {
+        // Position with cascade
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const x = Math.min(40 + windowOffset, vw - app.width - 40);
+        const y = Math.min(40 + windowOffset + 28, vh - app.height - 100);
+        windowOffset = (windowOffset + 30) % 120;
 
-      winEl.style.left = x + 'px';
-      winEl.style.top = y + 'px';
-      winEl.style.width = app.width + 'px';
-      winEl.style.height = app.height + 'px';
+        winEl.style.left = x + 'px';
+        winEl.style.top = y + 'px';
+        winEl.style.width = app.width + 'px';
+        winEl.style.height = app.height + 'px';
+      }
       winEl.style.zIndex = nextZ++;
 
       // Trigger open animation
@@ -3051,6 +3678,10 @@
             <button class="traffic-light yellow" data-action="minimize" title="Minimize">\u2212</button>
             <button class="traffic-light green" data-action="maximize" title="Maximize">+</button>
           </div>
+          <div class="ios-back-btn">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            <span>Home</span>
+          </div>
           <span class="mac-window-title">${app.title}</span>
         </div>
         <div class="mac-window-content"></div>
@@ -3064,6 +3695,23 @@
 
       div.addEventListener('mousedown', () => focusWindow(windowId));
       div.addEventListener('touchstart', () => focusWindow(windowId));
+
+      const iosBackBtn = div.querySelector('.ios-back-btn');
+      if (iosBackBtn) {
+        iosBackBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          const finderLayout = div.querySelector('.finder-layout');
+          if (appName === 'finder' && finderLayout && finderLayout.classList.contains('detail-active')) {
+            finderLayout.classList.remove('detail-active');
+            const titleEl = div.querySelector('.mac-window-title');
+            if (titleEl) titleEl.textContent = 'About Me';
+            const backBtnText = iosBackBtn.querySelector('span');
+            if (backBtnText) backBtnText.textContent = 'Home';
+          } else {
+            minimizeWindow(windowId);
+          }
+        });
+      }
 
       div.querySelectorAll('.traffic-light').forEach(btn => {
         btn.addEventListener('click', e => {
@@ -3086,9 +3734,15 @@
       const win = windows[windowId];
       if (!win || win.isClosed) return;
 
-      win.element.style.opacity = '0';
-      win.element.style.transform = 'scale(0.9)';
-      win.element.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      if (isMobile) {
+        win.element.style.transform = 'translateY(100%)';
+        win.element.style.opacity = '0';
+        win.element.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+      } else {
+        win.element.style.opacity = '0';
+        win.element.style.transform = 'scale(0.9)';
+        win.element.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      }
 
       setTimeout(() => {
         if (win.element.parentNode) win.element.parentNode.removeChild(win.element);
@@ -3116,6 +3770,31 @@
     function minimizeWindow(windowId) {
       const win = windows[windowId];
       if (!win || win.isClosed || win.isMinimized) return;
+
+      if (isMobile) {
+        win.element.classList.add('minimized');
+        setTimeout(() => {
+          win.isMinimized = true;
+          win.element.style.visibility = 'hidden';
+          win.element.classList.remove('minimized');
+
+          updateDockDots();
+          
+          if (activeWindow === windowId) {
+            activeWindow = null;
+            const remaining = Object.values(windows)
+              .filter(w => !w.isClosed && !w.isMinimized)
+              .sort((a, b) => b.zIndex - a.zIndex);
+            if (remaining.length > 0) {
+              focusWindow(remaining[0].id);
+            } else {
+              menuAppName.textContent = 'Finder';
+            }
+          }
+          updateWindowMenu();
+        }, 380);
+        return;
+      }
 
       const rect = win.element.getBoundingClientRect();
       win.preMinimizeRect = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
@@ -3158,7 +3837,22 @@
       const win = windows[windowId];
       if (!win || !win.isMinimized) return;
 
-      const rect = win.preMinimizeRect;
+      if (isMobile) {
+        win.element.style.visibility = 'visible';
+        win.element.classList.remove('minimized');
+        win.isMinimized = false;
+        focusWindow(windowId);
+        updateDockDots();
+        updateWindowMenu();
+        return;
+      }
+
+      const rect = win.preMinimizeRect || {
+        left: Math.max(50, (window.innerWidth - 800) / 2),
+        top: Math.max(50, (window.innerHeight - 600) / 2),
+        width: Math.min(800, window.innerWidth - 40),
+        height: Math.min(600, window.innerHeight - 100)
+      };
       win.element.style.visibility = 'visible';
       win.element.style.left = rect.left + 'px';
       win.element.style.top = rect.top + 'px';
@@ -3418,36 +4112,54 @@
         <div class="finder-layout">
           <div class="finder-sidebar">
             <div class="finder-sidebar-section">
-              <div class="finder-sidebar-title">Favorites</div>
-              <div class="finder-sidebar-item active" data-section="profile">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Profile
-              </div>
-              <div class="finder-sidebar-item" data-section="tech">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                Core Tech
-              </div>
-              <div class="finder-sidebar-item" data-section="education">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.24 3 5 3s5-1.34 5-3v-5"/></svg>
-                Education
+              <div class="finder-sidebar-title finder-sidebar-section-title">Favorites</div>
+              <div class="finder-sidebar-list">
+                <div class="finder-sidebar-item active" data-section="profile">
+                  <div class="sidebar-item-inner">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Profile
+                  </div>
+                </div>
+                <div class="finder-sidebar-item" data-section="tech">
+                  <div class="sidebar-item-inner">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    Core Tech
+                  </div>
+                </div>
+                <div class="finder-sidebar-item" data-section="education">
+                  <div class="sidebar-item-inner">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.24 3 5 3s5-1.34 5-3v-5"/></svg>
+                    Education
+                  </div>
+                </div>
               </div>
             </div>
             <div class="finder-sidebar-section">
-              <div class="finder-sidebar-title">Recents</div>
-              <div class="finder-sidebar-item" data-section="interests">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-                Photos
+              <div class="finder-sidebar-title finder-sidebar-section-title">Recents</div>
+              <div class="finder-sidebar-list">
+                <div class="finder-sidebar-item" data-section="interests">
+                  <div class="sidebar-item-inner">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    Photos
+                  </div>
+                </div>
               </div>
             </div>
             <div class="finder-sidebar-section">
-              <div class="finder-sidebar-title">Locations</div>
-              <div class="finder-sidebar-item" data-section="location-gorkha">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                Haramtari, Gorkha
-              </div>
-              <div class="finder-sidebar-item" data-section="location-madhyapur">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                Madhyapur Thimi
+              <div class="finder-sidebar-title finder-sidebar-section-title">Locations</div>
+              <div class="finder-sidebar-list">
+                <div class="finder-sidebar-item" data-section="location-gorkha">
+                  <div class="sidebar-item-inner">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Haramtari, Gorkha
+                  </div>
+                </div>
+                <div class="finder-sidebar-item" data-section="location-madhyapur">
+                  <div class="sidebar-item-inner">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Madhyapur Thimi
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -3457,23 +4169,46 @@
         </div>
       `;
 
+      const layout = content.querySelector('.finder-layout');
+      const main = content.querySelector('#finder-main');
+
+      function updateFinderContent(title, htmlContent) {
+        if (isMobile) {
+          main.innerHTML = `
+            <div class="finder-main-content">
+              ${htmlContent}
+            </div>
+          `;
+          const winTitleBar = el.querySelector('.mac-window-titlebar');
+          if (winTitleBar) {
+            const titleEl = winTitleBar.querySelector('.mac-window-title');
+            if (titleEl) titleEl.textContent = title;
+            const backBtnText = winTitleBar.querySelector('.ios-back-btn span');
+            if (backBtnText) backBtnText.textContent = 'Back';
+          }
+          layout.classList.add('detail-active');
+        } else {
+          main.innerHTML = htmlContent;
+          layout.classList.remove('detail-active');
+        }
+      }
+
       // Sidebar navigation
       content.querySelectorAll('.finder-sidebar-item').forEach(item => {
         item.addEventListener('click', () => {
           content.querySelectorAll('.finder-sidebar-item').forEach(i => i.classList.remove('active'));
           item.classList.add('active');
           const section = item.dataset.section;
-          const main = content.querySelector('#finder-main');
-          if (section === 'profile') main.innerHTML = getFinderProfileHTML();
-          if (section === 'tech') main.innerHTML = getFinderTechHTML();
-          if (section === 'education') main.innerHTML = getFinderEducationHTML();
+          if (section === 'profile') updateFinderContent('Profile', getFinderProfileHTML());
+          if (section === 'tech') updateFinderContent('Core Tech', getFinderTechHTML());
+          if (section === 'education') updateFinderContent('Education', getFinderEducationHTML());
           if (section === 'interests') {
             loadDynamicPhotos().then(() => {
-              main.innerHTML = getFinderInterestsHTML();
+              updateFinderContent('Photos', getFinderInterestsHTML());
             });
           }
-          if (section === 'location-gorkha') main.innerHTML = getFinderGorkhaHTML();
-          if (section === 'location-madhyapur') main.innerHTML = getFinderMadhyapurHTML();
+          if (section === 'location-gorkha') updateFinderContent('Haramtari, Gorkha', getFinderGorkhaHTML());
+          if (section === 'location-madhyapur') updateFinderContent('Madhyapur Thimi', getFinderMadhyapurHTML());
         });
       });
     }
@@ -4275,9 +5010,29 @@
       });
 
       // Responsive check
-      window.addEventListener('resize', () => {
+      function checkResponsive() {
+        const wasMobile = isMobile;
         isMobile = window.innerWidth <= 768;
-      });
+        if (isMobile) {
+          document.documentElement.classList.add('ios-mode');
+          // Hide macOS elements explicitly
+          dock.classList.remove('visible');
+          menuBar.classList.remove('visible');
+          updateIosStatusBar();
+        } else {
+          document.documentElement.classList.remove('ios-mode');
+          // Restore macOS elements
+          dock.classList.add('visible');
+          menuBar.classList.add('visible');
+        }
+        
+        if (wasMobile !== isMobile) {
+          closeAllActiveWindows();
+        }
+      }
+
+      window.addEventListener('resize', checkResponsive);
+      checkResponsive();
 
       // ── Menu Bar Dropdowns ──────────────────────────────────────────
       const menuItems = document.querySelectorAll('.menu-item');
@@ -4343,14 +5098,51 @@
       });
     }
 
+    function setupIosEventListeners() {
+      document.querySelectorAll('.ios-app-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const appName = item.dataset.app;
+          if (appName) handleAppLaunch(appName);
+        });
+      });
+
+      document.querySelectorAll('.ios-dock-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const appName = item.dataset.app;
+          if (appName) handleAppLaunch(appName);
+        });
+      });
+
+      const homeIndicator = $('iosHomeIndicator');
+      if (homeIndicator) {
+        homeIndicator.addEventListener('click', () => {
+          closeAllActiveWindows();
+        });
+
+        let startY = 0;
+        homeIndicator.addEventListener('touchstart', (e) => {
+          startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        homeIndicator.addEventListener('touchend', (e) => {
+          const endY = e.changedTouches[0].clientY;
+          if (startY - endY > 40) {
+            closeAllActiveWindows();
+          }
+        }, { passive: true });
+      }
+    }
+
     // ============================================
     // INIT
     // ============================================
     function init() {
       initTheme();
       updateClock();
-      setInterval(updateClock, 60000);
+      setInterval(updateClock, 1000);
       setupEventListeners();
+      setupIosEventListeners();
+      initBattery();
       loadDynamicPhotos();
       startBootSequence();
     }
