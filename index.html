@@ -56,6 +56,7 @@
       --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
       --font-mono: 'SF Mono', 'SFMono-Regular', 'Fira Code', 'Menlo', 'Monaco', monospace;
       --bg-wallpaper: url('light.jpg');
+      --bg-card: rgba(255, 255, 255, 0.82);
     }
 
     [data-theme="dark"] {
@@ -77,6 +78,7 @@
       --shadow-window: 0 22px 70px rgba(0,0,0,0.45), 0 8px 20px rgba(0,0,0,0.25);
       --shadow-window-inactive: 0 12px 40px rgba(0,0,0,0.20), 0 4px 12px rgba(0,0,0,0.12);
       --bg-wallpaper: url('dark-clean.png');
+      --bg-card: rgba(20, 20, 20, 0.82);
     }
 
     html, body {
@@ -2275,7 +2277,7 @@
       display: none;
       justify-content: space-between;
       align-items: center;
-      color: #ffffff;
+      color: var(--text-primary);
       z-index: 10000;
       font-size: 14px;
       font-weight: 600;
@@ -2298,7 +2300,7 @@
     .ios-battery {
       width: 24px;
       height: 12px;
-      border: 1px solid #ffffff;
+      border: 1px solid currentColor;
       border-radius: 3px;
       padding: 1px;
       position: relative;
@@ -2314,13 +2316,13 @@
       top: 3px;
       width: 2px;
       height: 4px;
-      background: #ffffff;
+      background: currentColor;
       border-radius: 0 1px 1px 0;
     }
 
     .ios-battery-level {
       height: 100%;
-      background: #ffffff;
+      background: currentColor;
       border-radius: 1px;
       transition: width 0.3s;
     }
@@ -2478,6 +2480,9 @@
       display: flex !important;
       flex-direction: column !important;
       background: var(--bg-card) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      padding-top: 44px !important;
       overflow: hidden !important;
     }
 
@@ -2495,7 +2500,15 @@
     }
 
     .ios-mode .mac-window .mac-window-titlebar {
-      display: none !important;
+      display: flex !important;
+      height: 44px !important;
+      background: transparent !important;
+      border-bottom: 1px solid var(--border-subtle) !important;
+      align-items: center !important;
+      justify-content: center !important;
+      position: relative !important;
+      padding: 0 16px !important;
+      flex-shrink: 0 !important;
     }
 
     .ios-mode .mac-window .traffic-lights {
@@ -2504,6 +2517,38 @@
 
     .mac-window .ios-back-btn {
       display: none;
+    }
+
+    .ios-mode .mac-window .ios-back-btn {
+      display: flex !important;
+      align-items: center !important;
+      position: absolute !important;
+      left: 12px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      color: var(--accent-blue) !important;
+      font-size: 16px !important;
+      font-weight: 400 !important;
+      cursor: pointer !important;
+      gap: 3px !important;
+      z-index: 100 !important;
+      user-select: none;
+    }
+
+    .ios-mode .mac-window .ios-back-btn svg {
+      width: 20px !important;
+      height: 20px !important;
+      stroke: currentColor !important;
+      fill: none !important;
+      stroke-width: 2.5px !important;
+    }
+
+    .ios-mode .mac-window .mac-window-title {
+      font-size: 17px !important;
+      font-weight: 600 !important;
+      color: var(--text-primary) !important;
+      text-align: center !important;
+      margin: 0 !important;
     }
 
     .ios-mode .mac-window .mac-window-content {
@@ -2561,7 +2606,7 @@
     .ios-mode .finder-sidebar {
       width: 100% !important;
       height: 100% !important;
-      background: var(--bg-card) !important;
+      background: transparent !important;
       padding: 16px !important;
       box-sizing: border-box !important;
       overflow-y: auto !important;
@@ -2658,7 +2703,7 @@
       left: 0 !important;
       width: 100% !important;
       height: 100% !important;
-      background: var(--bg-card) !important;
+      background: transparent !important;
       transform: translateX(100%);
       transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
       z-index: 10;
@@ -2677,6 +2722,11 @@
       padding: 16px !important;
       box-sizing: border-box;
       padding-bottom: 40px !important;
+    }
+
+    .ios-mode .safari-chrome,
+    .ios-mode .safari-tabs {
+      background: transparent !important;
     }
   </style>
 </head>
