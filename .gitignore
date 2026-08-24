@@ -5,3 +5,7 @@
 Thumbs.db
 
 .vercel
+node_modules/
+dist/
+dist.zip
+.env

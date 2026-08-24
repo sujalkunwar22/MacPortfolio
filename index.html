@@ -3206,8 +3206,10 @@
       { app: 'finder', label: 'Core Tech', keywords: 'javascript css html python web technologies tech stack skills' },
       { app: 'finder', label: 'Education', keywords: 'education learning academic background' },
       { app: 'finder', label: 'P', keywords: 'photography guitar ukulele cafe landscape changunarayan gorkha' },
-      { app: 'safari', label: 'Recipe Sharing Engine', keywords: 'recipe web project food cooking platform' },
-      { app: 'safari', label: 'Social Studies Framework', keywords: 'curriculum 132 day academic framework lesson plan education' },
+      { app: 'safari', label: 'Service Management System', keywords: 'service management system java track client db' },
+      { app: 'safari', label: 'Weather Forecaster', keywords: 'weather forecast application real-time api updates' },
+      { app: 'safari', label: 'Canteen Expenses Tracker', keywords: 'canteen expense tracker budget python' },
+      { app: 'safari', label: 'XO Club Website', keywords: 'xo club kathmandu thamel nightlife website booking vercel' },
       { app: 'terminal', label: 'help command', keywords: 'help commands available' },
       { app: 'terminal', label: 'skills command', keywords: 'skills technical expertise tools' },
       { app: 'terminal', label: 'experience command', keywords: 'experience work history milestones' },
@@ -4751,8 +4753,27 @@
       return `
         <div class="safari-projects-grid">
           <div class="project-card">
-            <div class="project-card-image" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); display:flex;align-items:center;justify-content:center;">
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#64B5F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+            <div class="project-card-image" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); display:flex;align-items:center;justify-content:center;">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="sms-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00F2FE"/>
+                    <stop offset="100%" stop-color="#4FACFE"/>
+                  </linearGradient>
+                  <filter id="sms-shadow" x="-10%" y="-10%" width="120%" height="120%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/>
+                  </filter>
+                </defs>
+                <path d="M32 6 L54 18 L54 46 L32 58 L10 46 L10 18 Z" fill="url(#sms-grad)" opacity="0.15"/>
+                <path d="M32 6 L54 18 L54 46 L32 58 L10 46 L10 18 Z" stroke="url(#sms-grad)" stroke-width="2.5" stroke-linejoin="round" filter="url(#sms-shadow)"/>
+                <circle cx="32" cy="32" r="8" fill="url(#sms-grad)"/>
+                <circle cx="32" cy="18" r="4" fill="#ffffff"/>
+                <circle cx="44" cy="38" r="4" fill="#ffffff"/>
+                <circle cx="20" cy="38" r="4" fill="#ffffff"/>
+                <line x1="32" y1="22" x2="32" y2="28" stroke="#ffffff" stroke-width="2"/>
+                <line x1="34" y1="34" x2="41" y2="37" stroke="#ffffff" stroke-width="2"/>
+                <line x1="30" y1="34" x2="23" y2="37" stroke="#ffffff" stroke-width="2"/>
+              </svg>
             </div>
             <div class="project-card-body">
               <h4>Service Management System</h4>
@@ -4768,8 +4789,26 @@
             </div>
           </div>
           <div class="project-card">
-            <div class="project-card-image" style="background: linear-gradient(135deg, #0f3460 0%, #4FC3F7 100%); display:flex;align-items:center;justify-content:center;">
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <div class="project-card-image" style="background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 100%); display:flex;align-items:center;justify-content:center;">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="sun-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FFA800"/>
+                    <stop offset="100%" stop-color="#FF5E62"/>
+                  </linearGradient>
+                  <linearGradient id="cloud-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#FFFFFF"/>
+                    <stop offset="100%" stop-color="#B0D4FF"/>
+                  </linearGradient>
+                  <filter id="cloud-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000" flood-opacity="0.25"/>
+                  </filter>
+                </defs>
+                <circle cx="40" cy="24" r="14" fill="url(#sun-grad)"/>
+                <path d="M40 6v4M40 38v4M22 24h4M54 24h4M27.2 11.2l2.8 2.8M50 34l2.8 2.8M27.2 36.8l2.8-2.8M50 14l2.8-2.8" stroke="url(#sun-grad)" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M46 44 A10 10 0 0 0 46 24 A10 10 0 0 0 34 22 A12 12 0 0 0 14 30 A10 10 0 0 0 20 44 Z" fill="url(#cloud-grad)" filter="url(#cloud-shadow)"/>
+                <path d="M46 44 A10 10 0 0 0 46 24 A10 10 0 0 0 34 22 A12 12 0 0 0 14 30 A10 10 0 0 0 20 44 Z" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
             </div>
             <div class="project-card-body">
               <h4>Weather Forecaster</h4>
@@ -4786,8 +4825,26 @@
             </div>
           </div>
           <div class="project-card">
-            <div class="project-card-image" style="background: linear-gradient(135deg, #1b4332 0%, #52b788 100%); display:flex;align-items:center;justify-content:center;">
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="1" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <div class="project-card-image" style="background: linear-gradient(135deg, #064e3b 0%, #059669 100%); display:flex;align-items:center;justify-content:center;">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="fin-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#11998E"/>
+                    <stop offset="100%" stop-color="#38EF7D"/>
+                  </linearGradient>
+                  <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FFD700"/>
+                    <stop offset="100%" stop-color="#FFA500"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="32" cy="32" r="26" stroke="url(#fin-grad)" stroke-width="2.5" stroke-dasharray="4 4" opacity="0.6"/>
+                <path d="M18 22 h28 a4 4 0 0 1 4 4 v18 a4 4 0 0 1 -4 4 h-28 a4 4 0 0 1 -4 -4 v-18 a4 4 0 0 1 4 -4 Z" fill="url(#fin-grad)" opacity="0.15"/>
+                <path d="M18 22 h28 a4 4 0 0 1 4 4 v18 a4 4 0 0 1 -4 4 h-28 a4 4 0 0 1 -4 -4 v-18 a4 4 0 0 1 4 -4 Z" stroke="url(#fin-grad)" stroke-width="2.5"/>
+                <path d="M40 28 h6 a2 2 0 0 1 2 2 v6 a2 2 0 0 1 -2 2 h-6 Z" fill="url(#fin-grad)"/>
+                <circle cx="43" cy="33" r="2" fill="#ffffff"/>
+                <circle cx="32" cy="18" r="6" fill="url(#gold-grad)"/>
+                <text x="32" y="22" font-family="'SF Pro Display', sans-serif" font-size="10" font-weight="900" fill="#ffffff" text-anchor="middle">$</text>
+              </svg>
             </div>
             <div class="project-card-body">
               <h4>Canteen Expenses Tracker</h4>
@@ -4799,6 +4856,44 @@
               </div>
               <div class="project-card-actions">
                 <a class="project-btn" href="https://github.com/sujalkunwar22/canteen.git" target="_blank">Source Code</a>
+              </div>
+            </div>
+          </div>
+          <div class="project-card">
+            <div class="project-card-image" style="background: linear-gradient(135deg, #09090b 0%, #1e1b4b 100%); display:flex;align-items:center;justify-content:center;">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="xo-neon" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF007F"/>
+                    <stop offset="50%" stop-color="#9D4EDD"/>
+                    <stop offset="100%" stop-color="#7B2CBF"/>
+                  </linearGradient>
+                  <filter id="xo-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feMerge>
+                      <feMergeNode in="blur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <circle cx="32" cy="32" r="28" stroke="url(#xo-neon)" stroke-width="1.5" opacity="0.3" stroke-dasharray="2 6"/>
+                <circle cx="32" cy="32" r="18" stroke="url(#xo-neon)" stroke-width="4.5" filter="url(#xo-glow)"/>
+                <path d="M22 22 L42 42 M42 22 L22 42" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" filter="url(#xo-glow)"/>
+                <circle cx="32" cy="32" r="3" fill="#ffffff"/>
+              </svg>
+            </div>
+            <div class="project-card-body">
+              <h4>XO Club Website</h4>
+              <p>A premium, state-of-the-art nightlife website for Club XO Kathmandu in Thamel. Features immersive landing page layouts, booking integration, and smooth interactive event showcases.</p>
+              <div class="project-card-badges">
+                <span class="project-badge">TypeScript</span>
+                <span class="project-badge">Vite</span>
+                <span class="project-badge">GSAP</span>
+                <span class="project-badge">Supabase</span>
+              </div>
+              <div class="project-card-actions">
+                <a class="project-btn" href="https://xo-omega-five.vercel.app/" target="_blank">Live Demo</a>
+                <a class="project-btn" href="https://github.com/sujalkunwar22/XO.git" target="_blank">Source Code</a>
               </div>
             </div>
           </div>
